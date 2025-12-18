@@ -47,25 +47,18 @@ export default function ProductDetail() {
     }
   }
 
-  const nextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % galleryImages.length)
-  }
-
-  const prevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)
-  }
-
   // Scroll wheel navigation for gallery
   useEffect(() => {
     const galleryElement = document.querySelector('[data-gallery-container]')
     if (!galleryElement || galleryImages.length <= 1) return
 
-    const handleWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey && !isLightboxOpen) {
-        e.preventDefault()
-        if (e.deltaY > 0) {
+    const handleWheel = (e: Event) => {
+      const wheelEvent = e as WheelEvent
+      if (!wheelEvent.ctrlKey && !wheelEvent.metaKey && !isLightboxOpen) {
+        wheelEvent.preventDefault()
+        if (wheelEvent.deltaY > 0) {
           setSelectedImage((prev) => (prev + 1) % galleryImages.length)
-        } else if (e.deltaY < 0) {
+        } else if (wheelEvent.deltaY < 0) {
           setSelectedImage((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)
         }
       }

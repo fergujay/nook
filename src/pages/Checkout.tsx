@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CreditCard, Truck, MapPin } from 'lucide-react'
+import { CreditCard, MapPin } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 
 export default function Checkout() {
