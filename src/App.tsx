@@ -13,10 +13,13 @@ import TextileCare from "./pages/TextileCare";
 import Courier from "./pages/Courier";
 
 function App() {
+  // Get base path from environment or default to root
+  const basePath = import.meta.env.BASE_URL || '/'
+  
   return (
     <LanguageProvider>
       <CartProvider>
-        <Router>
+        <Router basename={basePath}>
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
