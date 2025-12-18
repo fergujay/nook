@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size: 16px;
+  --background: #fbe2b2;
+  --foreground: #383837;
+  --card: #f9f4ee;
+  --card-foreground: #383837;
+  --popover: #f9f4ee;
+  --popover-foreground: #383837;
+  --primary: #a72729;
+  --primary-foreground: #f9f4ee;
+  --secondary: #f9f4ee;
+  --secondary-foreground: #383837;
+  --muted: #f9f4ee;
+  --muted-foreground: #717182;
+  --accent: #a72729;
+  --accent-foreground: #f9f4ee;
+  --destructive: #a72729;
+  --destructive-foreground: #f9f4ee;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+}
+
+@layer base {
+  * {
+    @apply antialiased;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: "Raleway", sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    @apply font-medium py-3 px-8 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-secondary {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    @apply font-medium py-3 px-8 border-2 transition-all duration-300 shadow-sm hover:shadow-md;
+    border-color: var(--border);
+  }
+
+  .btn-outline {
+    @apply bg-transparent font-medium py-3 px-8 border-2 transition-all duration-300;
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    @apply shadow-soft border p-6 transition-all duration-300 hover:shadow-medium;
+    border-color: var(--border);
+  }
+
+  .card-hover {
+    @apply card hover:-translate-y-1;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, var(--primary), var(--accent));
+  }
+
+  .heading-large {
+    @apply text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight;
+  }
+
+  .heading-medium {
+    @apply text-3xl md:text-4xl font-medium tracking-tight;
+  }
+}
