@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
+import { getAssetPath } from "../utils/images";
 
 export default function Cart() {
   const { items, updateQuantity, removeFromCart, totalItems, totalPrice } =
@@ -39,9 +40,9 @@ export default function Cart() {
           {items.map((item) => (
             <div key={item.id} className="card flex flex-col sm:flex-row gap-6">
               <img
-                src={item.image}
+                src={getAssetPath(item.image)}
                 alt={item.name}
-                className="w-full sm:w-40 h-40 object-cover rounded-xl"
+                className="w-full sm:w-40 h-40 object-cover"
               />
               <div className="flex-grow flex flex-col justify-between">
                 <div>

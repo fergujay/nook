@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { useCart } from '../contexts/CartContext'
+import { getAssetPath } from '../utils/images'
 
 export default function Favorites() {
   const { items, removeFromFavorites } = useFavorites()
@@ -37,7 +38,7 @@ export default function Favorites() {
             <Link to={`/products/${item.id}`} className="block">
               <div className="relative aspect-square overflow-hidden rounded-xl mb-5 bg-gray-100">
                 <img
-                  src={item.image}
+                  src={getAssetPath(item.image)}
                   alt={item.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Clock, Phone, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { products } from "../data/products";
+import { getAssetPath } from "../utils/images";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -105,7 +106,7 @@ export default function Home() {
             }}
           >
             <img
-              src="/products/2-carrara-marble-tablecloth/main.jpg"
+              src={getAssetPath('products/2-carrara-marble-tablecloth/main.jpg')}
               alt="Carrara Marble Tablecloth"
               className="w-full h-full object-cover"
               style={{ minHeight: "120%" }}
@@ -179,7 +180,7 @@ export default function Home() {
                 }}
               >
                 <img
-                  src={image}
+                  src={getAssetPath(image)}
                   alt={`Pink coral Tablecloth - View ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
@@ -289,7 +290,7 @@ export default function Home() {
                 }}
               >
                 <img
-                  src={image}
+                  src={getAssetPath(image)}
                   alt={`Reindeer moss Table runner - View ${index + 1}`}
                   className="w-full h-full object-cover"
                 />

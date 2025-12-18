@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ShoppingCart } from 'lucide-react'
 import { Product } from '../data/products'
 import { useCart } from '../contexts/CartContext'
+import { getAssetPath } from '../utils/images'
 
 interface ProductCardProps {
   product: Product
@@ -29,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       >
         <div className="relative aspect-[3/2] overflow-hidden border-b" style={{ backgroundColor: 'var(--muted)', borderColor: 'var(--border)' }}>
           <img
-            src={product.image}
+            src={getAssetPath(product.image)}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />

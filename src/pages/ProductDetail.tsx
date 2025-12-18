@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard'
 import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 import { Zoom } from 'yet-another-react-lightbox/plugins'
+import { getAssetPath } from '../utils/images'
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>()
@@ -19,9 +20,9 @@ export default function ProductDetail() {
   
   const galleryImages = product?.gallery || [product?.image || ''].filter(Boolean)
   
-  // Prepare images for lightbox
+  // Prepare images for lightbox with correct base path
   const lightboxSlides = galleryImages.map((src) => ({
-    src,
+    src: getAssetPath(src),
     alt: product?.name || '',
   }))
 
@@ -101,7 +102,7 @@ export default function ProductDetail() {
             onClick={() => setIsLightboxOpen(true)}
           >
             <img
-              src={galleryImages[selectedImage]}
+              src={getAssetPath(galleryImages[selectedImage])}
               alt={product.name}
               className="max-w-full max-h-full w-auto h-auto object-contain transition-opacity duration-500 ease-out group-hover:opacity-90"
               style={{ 

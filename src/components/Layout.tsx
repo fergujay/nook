@@ -3,6 +3,7 @@ import { ShoppingBag, Menu, X, Globe } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { getAssetPath } from "../utils/images";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -51,7 +52,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <img
-                src="/logo.svg"
+                src={getAssetPath('logo.svg')}
                 alt="Nook"
                 className="h-6 group-hover:opacity-80 transition-opacity"
               />
@@ -298,7 +299,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {/* Left Column - TEXTILE SHOP */}
             <div>
-              <img src="/logo-white.svg" alt="Nook" className="h-6 mb-4" />
+              <img src={getAssetPath('logo-white.svg')} alt="Nook" className="h-6 mb-4" />
               <h3
                 className="text-lg font-semibold mb-4 uppercase"
                 style={{ color: "#d3d3d3" }}
