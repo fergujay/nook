@@ -43,21 +43,24 @@ export default function Home() {
   const [linenProductIndex, setLinenProductIndex] = useState(0);
   const [isCottonImageHovered, setIsCottonImageHovered] = useState(false);
   const [isLinenImageHovered, setIsLinenImageHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 768
+  );
 
   // Hero slider images
   const heroImages = [
-    "slider/IMG_6031.jpg",
-    "slider/IMG_6032.jpg",
-    "slider/IMG_6035.jpg",
-    "slider/IMG_6043.jpg",
-    "slider/IMG_6046.jpg",
-    "slider/IMG_6047.jpg",
-    "slider/IMG_6049.jpg",
-    "slider/IMG_6051.jpg",
-    "slider/IMG_6059.jpg",
-    "slider/IMG_6060.jpg",
-    "slider/IMG_6061.jpg",
-    "slider/IMG_6063.jpg",
+    "slider/hero-slider-01.jpg",
+    "slider/hero-slider-02.jpg",
+    "slider/hero-slider-03.jpg",
+    "slider/hero-slider-04.jpg",
+    "slider/hero-slider-05.jpg",
+    "slider/hero-slider-06.jpg",
+    "slider/hero-slider-07.jpg",
+    "slider/hero-slider-08.jpg",
+    "slider/hero-slider-09.jpg",
+    "slider/hero-slider-10.jpg",
+    "slider/hero-slider-11.jpg",
+    "slider/hero-slider-12.jpg",
   ];
 
   // Get all products for Cotton and Linen categories
@@ -103,6 +106,16 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // Check initial state
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle responsive video loading
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Update container width on resize
@@ -721,7 +734,7 @@ export default function Home() {
         {/* Background - Video */}
         <div className="absolute inset-0">
           <video
-            src={getAssetPath("4622325-uhd_4096_2160_25fps.mp4")}
+            key={isMobile ? "mobile" : "hd"}
             autoPlay
             loop
             muted
@@ -730,6 +743,11 @@ export default function Home() {
             style={{
               pointerEvents: "none",
             }}
+            src={
+              isMobile
+                ? getAssetPath("videos/atelier-background-mobile.mp4")
+                : getAssetPath("videos/atelier-background-hd.mp4")
+            }
           />
           {/* Dark overlay for better text readability */}
           <div className="absolute inset-0 bg-black/30"></div>
