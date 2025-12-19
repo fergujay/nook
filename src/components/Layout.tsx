@@ -127,6 +127,12 @@ export default function Layout({ children }: LayoutProps) {
                       style={{ backgroundColor: "var(--primary)" }}
                     />
                   )}
+                  {item.href === "/" && shouldBeTransparent && (
+                    <span
+                      className="absolute -bottom-1 left-0 right-0 h-0.5"
+                      style={{ backgroundColor: "white" }}
+                    />
+                  )}
                 </Link>
               ))}
             </div>
