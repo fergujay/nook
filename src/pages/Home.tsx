@@ -425,12 +425,16 @@ export default function Home() {
         <div
           ref={deliveryOverlayRef}
           className={`absolute bottom-4 right-4 sm:bottom-8 sm:right-8 backdrop-blur-sm p-4 sm:p-6 shadow-lg max-w-[calc(100%-2rem)] sm:max-w-xs transition-all duration-300 ${
-            isDeliveryOverlayTransparent ? "bg-transparent" : "bg-white/90"
+            isMobile || isDeliveryOverlayTransparent
+              ? "bg-transparent"
+              : "bg-white/90"
           }`}
         >
           <p
             className={`text-xs sm:text-sm mb-2 transition-colors duration-300 ${
-              isDeliveryOverlayTransparent ? "text-white" : "text-gray-900"
+              isMobile || isDeliveryOverlayTransparent
+                ? "text-white"
+                : "text-gray-900"
             }`}
             style={{ letterSpacing: isMobile ? "4px" : "6px" }}
           >
@@ -438,7 +442,9 @@ export default function Home() {
           </p>
           <p
             className={`text-xs sm:text-sm leading-relaxed transition-colors duration-300 ${
-              isDeliveryOverlayTransparent ? "text-white/90" : "text-gray-700"
+              isMobile || isDeliveryOverlayTransparent
+                ? "text-white/90"
+                : "text-gray-700"
             }`}
           >
             We accept and deliver orders on weekdays, from 10 AM to 7 PM.
