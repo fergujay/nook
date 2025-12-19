@@ -108,3 +108,12 @@
     @apply text-3xl md:text-4xl font-medium tracking-tight;
   }
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

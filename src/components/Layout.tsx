@@ -67,7 +67,7 @@ export default function Layout({ children }: LayoutProps) {
       }`}
     >
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full ${
           shouldBeTransparent
             ? ""
             : "bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100"
@@ -79,13 +79,20 @@ export default function Layout({ children }: LayoutProps) {
                 boxShadow: "none",
                 borderBottom: "none",
                 background: "transparent",
+                transition: "background-color 0.3s ease, box-shadow 0.3s ease, border-bottom 0.3s ease",
               }
             : mobileMenuOpen
             ? {
                 backgroundColor: "rgba(55, 55, 55, 0.95)",
                 backdropFilter: "blur(10px)",
+                borderBottom: "none",
+                transition: "background-color 0.2s ease, backdrop-filter 0.2s ease",
               }
-            : {}
+            : {
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(8px)",
+                transition: "background-color 0.2s ease, backdrop-filter 0.2s ease",
+              }
         }
       >
         <nav
@@ -309,10 +316,11 @@ export default function Layout({ children }: LayoutProps) {
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
             <div
-              className="md:hidden py-6 animate-fade-in border-t border-white/20"
+              className="md:hidden py-6 border-t border-white/20"
               style={{
                 backgroundColor: "rgba(55, 55, 55, 0.98)",
                 backdropFilter: "blur(10px)",
+                animation: "fadeIn 0.2s ease-in-out",
               }}
             >
               {navigation.map((item) => (
