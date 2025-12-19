@@ -268,7 +268,32 @@ export default function Layout({ children }: LayoutProps) {
                 )}
               </Link>
               <button
-                className="md:hidden p-2.5 transition-colors text-white/90 hover:text-white hover:bg-white/10"
+                className={`md:hidden p-2.5 transition-colors ${
+                  shouldBeTransparent && !mobileMenuOpen
+                    ? "text-white/90 hover:text-white hover:bg-white/10"
+                    : mobileMenuOpen
+                    ? "text-white/90 hover:text-white hover:bg-white/10"
+                    : ""
+                }`}
+                style={
+                  shouldBeTransparent && !mobileMenuOpen
+                    ? {}
+                    : mobileMenuOpen
+                    ? {}
+                    : { color: "var(--muted-foreground)" }
+                }
+                onMouseEnter={(e) => {
+                  if (!shouldBeTransparent && !mobileMenuOpen) {
+                    e.currentTarget.style.color = "var(--primary)";
+                    e.currentTarget.style.backgroundColor = "var(--muted)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!shouldBeTransparent && !mobileMenuOpen) {
+                    e.currentTarget.style.color = "var(--muted-foreground)";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }
+                }}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Menu"
               >
