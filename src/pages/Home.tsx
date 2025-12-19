@@ -7,10 +7,28 @@ import { getAssetPath } from "../utils/images";
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const heroImageRef = useRef<HTMLDivElement>(null);
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
   const [cottonSlideIndex, setCottonSlideIndex] = useState(0);
   const [linenSlideIndex, setLinenSlideIndex] = useState(0);
   const [isCottonHovered, setIsCottonHovered] = useState(false);
   const [isLinenHovered, setIsLinenHovered] = useState(false);
+
+  // Hero slider images
+  const heroImages = [
+    'slider/IMG_6031.jpg',
+    'slider/IMG_6032.jpg',
+    'slider/IMG_6035.jpg',
+    'slider/IMG_6043.jpg',
+    'slider/IMG_6046.jpg',
+    'slider/IMG_6047.jpg',
+    'slider/IMG_6049.jpg',
+    'slider/IMG_6051.jpg',
+    'slider/IMG_6059.jpg',
+    'slider/IMG_6060.jpg',
+    'slider/IMG_6061.jpg',
+    'slider/IMG_6063.jpg',
+  ];
 
   // Get product galleries
   const cottonProduct = products.find((p) => p.id === "4");
@@ -26,6 +44,17 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Hero slideshow
+  useEffect(() => {
+    if (isHeroHovered || heroImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isHeroHovered, heroImages.length]);
 
   // Cotton slideshow
   useEffect(() => {
@@ -52,8 +81,14 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section ref={heroImageRef} className="relative min-h-[100vh] flex items-center justify-center overflow-hidden" style={{ marginTop: '-80px', paddingTop: '80px' }}>
-        {/* Background Image */}
+      <section 
+        ref={heroImageRef} 
+        className="relative min-h-[100vh] flex items-center justify-center overflow-hidden" 
+        style={{ marginTop: '-80px', paddingTop: '80px' }}
+        onMouseEnter={() => setIsHeroHovered(true)}
+        onMouseLeave={() => setIsHeroHovered(false)}
+      >
+        {/* Background Image Carousel */}
         <div
           className="absolute inset-0"
           style={{
@@ -61,14 +96,25 @@ export default function Home() {
             willChange: "transform",
           }}
         >
-          <img
-            src={getAssetPath('products/2-carrara-marble-tablecloth/main.jpg')}
-            alt="Carrara Marble Tablecloth"
-            className="w-full h-full object-cover"
-            style={{ minHeight: "120%" }}
-          />
+          {heroImages.map((image, index) => (
+            <div
+              key={index}
+              className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+              style={{
+                opacity: index === heroSlideIndex ? 1 : 0,
+                zIndex: index === heroSlideIndex ? 1 : 0,
+              }}
+            >
+              <img
+                src={getAssetPath(image)}
+                alt={`Hero slide ${index + 1}`}
+                className="w-full h-full object-cover"
+                style={{ minHeight: "120%" }}
+              />
+            </div>
+          ))}
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 bg-black/30 z-10"></div>
         </div>
 
         {/* Text Content Overlay */}
