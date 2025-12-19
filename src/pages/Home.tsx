@@ -52,84 +52,66 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
-        {/* Left Column - Text Content */}
+      <section ref={heroImageRef} className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
         <div
-          className="flex flex-col justify-center"
-          style={{ backgroundColor: "var(--card)" }}
+          className="absolute inset-0"
+          style={{
+            transform: `translateY(${scrollY * 0.3}px)`,
+            willChange: "transform",
+          }}
         >
-          <div className="container-padding py-16 lg:py-24">
-            <div className="max-w-lg">
-              <p
-                className="text-sm md:text-base uppercase tracking-wider mb-4 font-medium"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                CURATED TEXTILES
-              </p>
-              <h1
-                className="heading-large mb-8 leading-tight"
-                style={{ color: "var(--foreground)" }}
-              >
-                Artistry in Every Thread
-            </h1>
-              <p
-                className="text-base md:text-lg mb-10 leading-relaxed"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                A carefully curated collection of exceptional fabrics, sourced
-                from the finest mills across Britain and beyond.
-              </p>
-              <Link
-                to="/products"
-                className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit"
-                style={{
-                  backgroundColor: "var(--primary)",
-                  color: "var(--primary-foreground)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-              >
-                VIEW COLLECTION
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
+          <img
+            src={getAssetPath('products/2-carrara-marble-tablecloth/main.jpg')}
+            alt="Carrara Marble Tablecloth"
+            className="w-full h-full object-cover"
+            style={{ minHeight: "120%" }}
+          />
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/30"></div>
         </div>
 
-        {/* Right Column - Product Image */}
-        <div ref={heroImageRef} className="relative overflow-hidden">
-          <div
-            className="absolute inset-0"
-            style={{
-              transform: `translateY(${scrollY * 0.3}px)`,
-              willChange: "transform",
-            }}
+        {/* Text Content Overlay */}
+        <div className="relative z-10 container-padding text-center max-w-4xl">
+          <p
+            className="text-sm md:text-base uppercase tracking-wider mb-4 font-medium text-white/90"
           >
-            <img
-              src={getAssetPath('products/2-carrara-marble-tablecloth/main.jpg')}
-              alt="Carrara Marble Tablecloth"
-              className="w-full h-full object-cover"
-              style={{ minHeight: "120%" }}
-            />
-          </div>
-          {/* Establishment Info Overlay */}
-          <div
-            className="absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs"
-            style={{ backgroundColor: "var(--card)" }}
+            CURATED TEXTILES
+          </p>
+          <h1
+            className="heading-large mb-8 leading-tight text-white"
           >
-            <p
-              className="text-sm font-semibold mb-2"
-              style={{ color: "var(--foreground)" }}
-            >
-              ESTABLISHED 2005
-            </p>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              Twenty years of excellence in textile craftsmanship
-            </p>
-          </div>
+            Artistry in Every Thread
+            </h1>
+          <p
+            className="text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto"
+          >
+            A carefully curated collection of exceptional fabrics, sourced
+            from the finest mills across Britain and beyond.
+          </p>
+          <Link
+            to="/products"
+            className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit bg-white text-gray-900 hover:bg-white/90"
+          >
+            VIEW COLLECTION
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+        </div>
+
+        {/* Establishment Info Overlay */}
+        <div
+          className="absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs bg-white/90"
+        >
+          <p
+            className="text-sm font-semibold mb-2 text-gray-900"
+          >
+            ESTABLISHED 2005
+          </p>
+          <p
+            className="text-sm leading-relaxed text-gray-700"
+          >
+            Twenty years of excellence in textile craftsmanship
+          </p>
         </div>
       </section>
 

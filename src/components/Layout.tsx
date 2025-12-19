@@ -12,10 +12,21 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { totalItems } = useCart();
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
+
+  // Detect scroll for header styling
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navigation = [
     { name: t("home"), href: "/" },
@@ -45,17 +56,35 @@ export default function Layout({ children }: LayoutProps) {
     };
   }, [languageMenuOpen]);
 
+  // Determine if we're on home page at top (for transparent header)
+  const isHomePage = location.pathname === '/';
+  const shouldBeTransparent = isHomePage && !isScrolled;
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="bg-white/95 backdrop-blur-sm shadow-soft sticky top-0 z-50 border-b border-gray-100 w-full">
+      <header 
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          shouldBeTransparent 
+            ? 'bg-transparent' 
+            : 'bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100'
+        }`}
+      >
         <nav className="container-padding">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <img
-                src={getAssetPath('logo.svg')}
-                alt="Nook"
-                className="h-6 group-hover:opacity-80 transition-opacity"
-              />
+              {shouldBeTransparent ? (
+                <img
+                  src={getAssetPath("logo-white.svg")}
+                  alt="Nook"
+                  className="h-6 group-hover:opacity-80 transition-opacity"
+                />
+              ) : (
+                <img
+                  src={getAssetPath("logo.svg")}
+                  alt="Nook"
+                  className="h-6 group-hover:opacity-80 transition-opacity"
+                />
+              )}
             </Link>
 
             {/* Desktop Navigation */}
@@ -65,13 +94,17 @@ export default function Layout({ children }: LayoutProps) {
                   key={item.href}
                   to={item.href}
                   className={`text-sm font-medium transition-all duration-200 relative ${
-                    location.pathname === item.href
-                      ? "text-primary-600"
-                      : "text-gray-700 hover:text-primary-600"
+                    shouldBeTransparent
+                      ? location.pathname === item.href
+                        ? "text-white"
+                        : "text-white/90 hover:text-white"
+                      : location.pathname === item.href
+                        ? "text-primary-600"
+                        : "text-gray-700 hover:text-primary-600"
                   }`}
                 >
                   {item.name}
-                  {location.pathname === item.href && (
+                  {location.pathname === item.href && !shouldBeTransparent && (
                     <span
                       className="absolute -bottom-1 left-0 right-0 h-0.5"
                       style={{ backgroundColor: "var(--primary)" }}
@@ -87,15 +120,23 @@ export default function Layout({ children }: LayoutProps) {
               <div className="relative" ref={languageMenuRef}>
                 <button
                   onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
-                  className="flex items-center gap-2 p-2.5 transition-all duration-200"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className={`flex items-center gap-2 p-2.5 transition-all duration-200 ${
+                    shouldBeTransparent
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : ""
+                  }`}
+                  style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "var(--primary)";
-                    e.currentTarget.style.backgroundColor = "var(--muted)";
+                    if (!shouldBeTransparent) {
+                      e.currentTarget.style.color = "var(--primary)";
+                      e.currentTarget.style.backgroundColor = "var(--muted)";
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "var(--muted-foreground)";
-                    e.currentTarget.style.backgroundColor = "transparent";
+                    if (!shouldBeTransparent) {
+                      e.currentTarget.style.color = "var(--muted-foreground)";
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }
                   }}
                   aria-label="Language"
                 >
@@ -143,15 +184,23 @@ export default function Layout({ children }: LayoutProps) {
               </div>
               <Link
                 to="/cart"
-                className="relative p-2.5 transition-all duration-200"
-                style={{ color: "var(--muted-foreground)" }}
+                className={`relative p-2.5 transition-all duration-200 ${
+                  shouldBeTransparent
+                    ? "text-white/90 hover:text-white hover:bg-white/10"
+                    : ""
+                }`}
+                style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--primary)";
-                  e.currentTarget.style.backgroundColor = "var(--muted)";
+                  if (!shouldBeTransparent) {
+                    e.currentTarget.style.color = "var(--primary)";
+                    e.currentTarget.style.backgroundColor = "var(--muted)";
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--muted-foreground)";
-                  e.currentTarget.style.backgroundColor = "transparent";
+                  if (!shouldBeTransparent) {
+                    e.currentTarget.style.color = "var(--muted-foreground)";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }
                 }}
                 aria-label={t("cart")}
               >
@@ -160,8 +209,8 @@ export default function Layout({ children }: LayoutProps) {
                   <span
                     className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md"
                     style={{
-                      backgroundColor: "var(--primary)",
-                      color: "var(--primary-foreground)",
+                      backgroundColor: shouldBeTransparent ? "rgba(255, 255, 255, 0.9)" : "var(--primary)",
+                      color: shouldBeTransparent ? "var(--primary)" : "var(--primary-foreground)",
                     }}
                   >
                     {totalItems}
@@ -169,14 +218,22 @@ export default function Layout({ children }: LayoutProps) {
                 )}
               </Link>
               <button
-                className="md:hidden p-2.5 transition-colors"
-                style={{ color: "var(--muted-foreground)" }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "var(--muted)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "transparent")
-                }
+                className={`md:hidden p-2.5 transition-colors ${
+                  shouldBeTransparent
+                    ? "text-white/90 hover:text-white hover:bg-white/10"
+                    : ""
+                }`}
+                style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
+                onMouseEnter={(e) => {
+                  if (!shouldBeTransparent) {
+                    e.currentTarget.style.backgroundColor = "var(--muted)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!shouldBeTransparent) {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }
+                }}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Menu"
               >
@@ -191,25 +248,44 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="md:hidden py-6 border-t border-gray-200 animate-fade-in">
+            <div 
+              className={`md:hidden py-6 animate-fade-in ${
+                shouldBeTransparent 
+                  ? "border-t border-white/20" 
+                  : "border-t border-gray-200"
+              }`}
+              style={shouldBeTransparent ? { backgroundColor: "rgba(0, 0, 0, 0.5)", backdropFilter: "blur(10px)" } : {}}
+            >
               {navigation.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block py-3 text-base font-medium transition-colors ${
-                    location.pathname === item.href
-                      ? "text-primary-600 border-l-4 border-primary-600 pl-4"
-                      : "text-gray-700 hover:text-primary-600 hover:pl-4 transition-all"
+                    shouldBeTransparent
+                      ? location.pathname === item.href
+                        ? "text-white border-l-4 border-white pl-4"
+                        : "text-white/90 hover:text-white hover:pl-4 transition-all"
+                      : location.pathname === item.href
+                        ? "text-primary-600 border-l-4 border-primary-600 pl-4"
+                        : "text-gray-700 hover:text-primary-600 hover:pl-4 transition-all"
                   }`}
                 >
                   {item.name}
                 </Link>
               ))}
               {/* Mobile Language Selector */}
-              <div className="pt-4 border-t border-gray-200 mt-4">
+              <div 
+                className={`pt-4 mt-4 ${
+                  shouldBeTransparent 
+                    ? "border-t border-white/20" 
+                    : "border-t border-gray-200"
+                }`}
+              >
                 <div className="flex items-center justify-between px-4">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className={`text-sm font-medium ${
+                    shouldBeTransparent ? "text-white/90" : "text-gray-700"
+                  }`}>
                     Language
                   </span>
                   <div className="flex gap-2">
@@ -299,7 +375,11 @@ export default function Layout({ children }: LayoutProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {/* Left Column - TEXTILE SHOP */}
             <div>
-              <img src={getAssetPath('logo-white.svg')} alt="Nook" className="h-6 mb-4" />
+              <img
+                src={getAssetPath("logo-white.svg")}
+                alt="Nook"
+                className="h-6 mb-4"
+              />
               <h3
                 className="text-lg font-semibold mb-4 uppercase"
                 style={{ color: "#d3d3d3" }}
