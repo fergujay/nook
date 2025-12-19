@@ -94,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
         >
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              {shouldBeTransparent && !mobileMenuOpen ? (
+              {shouldBeTransparent || mobileMenuOpen ? (
                 <img
                   src={getAssetPath("logo-white.svg")}
                   alt="Nook"
@@ -102,7 +102,7 @@ export default function Layout({ children }: LayoutProps) {
                 />
               ) : (
                 <img
-                  src={getAssetPath("logo-white.svg")}
+                  src={getAssetPath("logo.svg")}
                   alt="Nook"
                   className="h-6 group-hover:opacity-80 transition-opacity"
                 />
