@@ -74,7 +74,10 @@ export default function Layout({ children }: LayoutProps) {
             : {}
         }
       >
-        <nav className="container-padding">
+        <nav 
+          className="container-padding"
+          style={shouldBeTransparent ? { backgroundColor: "transparent" } : {}}
+        >
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               {shouldBeTransparent ? (
