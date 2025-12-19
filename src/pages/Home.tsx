@@ -383,26 +383,28 @@ export default function Home() {
         {/* Text Content Overlay */}
         <div className="relative z-10 container-padding text-center max-w-4xl">
           <p
-            className="text-sm md:text-base uppercase mb-4 font-medium text-white/90"
-            style={{ letterSpacing: "6px" }}
+            className="text-xs sm:text-sm md:text-base uppercase mb-3 sm:mb-4 font-medium text-white/90 px-2"
+            style={{ letterSpacing: isMobile ? "4px" : "6px" }}
           >
             TABLE LINEN MADE WITH LOVE ❤️
           </p>
           <h1
-            className="mb-8 leading-tight text-white"
-            style={{ fontSize: "92px" }}
+            className="mb-6 md:mb-8 leading-tight text-white"
+            style={{ 
+              fontSize: isMobile ? "clamp(2.5rem, 8vw, 5.75rem)" : "92px"
+            }}
           >
             Ćao! It's NOOK
           </h1>
-          <p className="text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto px-2">
             At NOOK we believe that a home is a place where every object
-            matters. That’s why we create table linen in small batches, with
+            matters. That's why we create table linen in small batches, with
             care for every detail.
           </p>
           <Link
             ref={heroButtonRef}
             to="/products"
-            className="font-semibold py-4 px-8 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit"
+            className="font-semibold py-3 px-6 sm:py-4 sm:px-8 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit text-sm sm:text-base"
             style={{
               backgroundColor: isHeroButtonHovered ? "transparent" : "white",
               color: isHeroButtonHovered ? "white" : "rgb(17, 24, 39)",
@@ -415,27 +417,27 @@ export default function Home() {
             onMouseLeave={() => setIsHeroButtonHovered(false)}
           >
             VIEW COLLECTION
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {/* Delivery Info Overlay */}
         <div
           ref={deliveryOverlayRef}
-          className={`absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs transition-all duration-300 ${
+          className={`absolute bottom-4 right-4 sm:bottom-8 sm:right-8 backdrop-blur-sm p-4 sm:p-6 shadow-lg max-w-[calc(100%-2rem)] sm:max-w-xs transition-all duration-300 ${
             isDeliveryOverlayTransparent ? "bg-transparent" : "bg-white/90"
           }`}
         >
           <p
-            className={`text-sm mb-2 transition-colors duration-300 ${
+            className={`text-xs sm:text-sm mb-2 transition-colors duration-300 ${
               isDeliveryOverlayTransparent ? "text-white" : "text-gray-900"
             }`}
-            style={{ letterSpacing: "6px" }}
+            style={{ letterSpacing: isMobile ? "4px" : "6px" }}
           >
             DELIVERY HOURS
           </p>
           <p
-            className={`text-sm leading-relaxed transition-colors duration-300 ${
+            className={`text-xs sm:text-sm leading-relaxed transition-colors duration-300 ${
               isDeliveryOverlayTransparent ? "text-white/90" : "text-gray-700"
             }`}
           >
@@ -452,22 +454,22 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto container-padding text-center">
           <p
-            className="text-sm md:text-base uppercase mb-6 font-medium"
+            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
             style={{
               color: "var(--muted-foreground)",
-              letterSpacing: "6px",
+              letterSpacing: isMobile ? "4px" : "6px",
             }}
           >
             OUR COLLECTION
           </p>
           <h2
-            className="heading-large mb-8"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
             style={{ color: "var(--foreground)" }}
           >
             Exceptional Textiles
           </h2>
           <p
-            className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "var(--muted-foreground)" }}
           >
             Each fabric in our collection is chosen for its unique character,
@@ -592,31 +594,32 @@ export default function Home() {
                 className="flex flex-col justify-center relative"
                 style={{ backgroundColor: "var(--card)" }}
               >
-                <div className="container-padding py-16 lg:py-24">
+                <div className="container-padding py-12 sm:py-16 lg:py-24">
                   <div className="max-w-lg text-center lg:text-left lg:pl-8">
                     <p
-                      className="text-xs md:text-sm uppercase mb-4 font-medium section-subtitle"
+                      className="text-xs sm:text-sm md:text-sm uppercase mb-3 sm:mb-4 font-medium section-subtitle"
                       style={{
                         color: "var(--muted-foreground)",
+                        letterSpacing: isMobile ? "4px" : "6px",
                       }}
                     >
                       {slide.subtitle}
                     </p>
                     <h2
-                      className="heading-large mb-6 leading-tight"
+                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-4 sm:mb-6 leading-tight"
                       style={{ color: "var(--foreground)" }}
                     >
                       {slide.title}
                     </h2>
                     <p
-                      className="text-base md:text-lg mb-10 leading-relaxed"
+                      className="text-sm sm:text-base md:text-lg mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
                       style={{ color: "var(--muted-foreground)" }}
                     >
                       {slide.description}
                     </p>
                     <Link
                       to={slide.link}
-                      className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group transition-all duration-300"
+                      className="text-xs sm:text-sm uppercase tracking-widest font-semibold inline-flex items-center group transition-all duration-300"
                       style={{
                         color: "var(--foreground)",
                         borderBottom: "1px solid var(--primary)",
@@ -645,10 +648,10 @@ export default function Home() {
           <>
             <button
               onClick={handlePrevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
               style={{
-                width: "48px",
-                height: "48px",
+                width: isMobile ? "40px" : "48px",
+                height: isMobile ? "40px" : "48px",
                 backgroundColor: "white",
                 border: "2px solid transparent",
                 color: "rgb(17, 24, 39)",
@@ -666,14 +669,14 @@ export default function Home() {
               }}
               aria-label="Previous slide"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             <button
               onClick={handleNextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
               style={{
-                width: "48px",
-                height: "48px",
+                width: isMobile ? "40px" : "48px",
+                height: isMobile ? "40px" : "48px",
                 backgroundColor: "white",
                 border: "2px solid transparent",
                 color: "rgb(17, 24, 39)",
@@ -691,7 +694,7 @@ export default function Home() {
               }}
               aria-label="Next slide"
             >
-              <ArrowRight className="h-5 w-5" />
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </>
         )}
@@ -704,22 +707,22 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto container-padding text-center">
           <p
-            className="text-sm md:text-base uppercase mb-6 font-medium"
+            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
             style={{
               color: "var(--muted-foreground)",
-              letterSpacing: "6px",
+              letterSpacing: isMobile ? "4px" : "6px",
             }}
           >
             OUR HERITAGE
           </p>
           <h2
-            className="heading-large mb-8"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
             style={{ color: "var(--foreground)" }}
           >
             Two Decades of Textile Excellence
           </h2>
           <p
-            className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "var(--muted-foreground)" }}
           >
             Since 2005, we've been dedicated to sourcing and supplying the
@@ -754,22 +757,22 @@ export default function Home() {
         </div>
 
         {/* Contact Information Overlay */}
-        <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-24 lg:py-32">
+        <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-12 sm:py-16 md:py-24 lg:py-32">
           <div className="max-w-7xl mx-auto w-full">
             <div className="max-w-2xl mx-auto text-center">
               <p
-                className="text-sm md:text-base text-white/80 uppercase mb-6 font-medium"
-                style={{ letterSpacing: "6px" }}
+                className="text-xs sm:text-sm md:text-base text-white/80 uppercase mb-4 sm:mb-6 font-medium px-2"
+                style={{ letterSpacing: isMobile ? "4px" : "6px" }}
               >
                 CONNECT WITH US
               </p>
               <h2
-                className="heading-large mb-8 leading-tight text-white"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 leading-tight text-white px-2"
                 style={{ color: "white" }}
               >
                 Visit Our Atelier
               </h2>
-              <p className="text-base md:text-lg text-white/90 mb-12 leading-relaxed max-w-xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg text-white/90 mb-8 sm:mb-12 leading-relaxed max-w-xl mx-auto px-2">
                 Experience our collection firsthand at our London atelier. We
                 welcome you to explore our fabrics and discuss your projects.
               </p>
@@ -777,38 +780,38 @@ export default function Home() {
 
             {/* Contact Information */}
             <div className="max-w-2xl mx-auto flex justify-center">
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8 w-full px-4">
                 {/* Location */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <MapPin className="h-6 w-6 text-white" />
+                    <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-medium text-white mb-2">
+                  <div className="text-left flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
                       Location
                     </h3>
-                    <p className="text-white/90 leading-relaxed">
+                    <p className="text-sm sm:text-base text-white/90 leading-relaxed break-words">
                       123 Fabric Street, London W1U 3QP, UK
                     </p>
                   </div>
                 </div>
 
                 {/* Opening Hours */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Clock className="h-6 w-6 text-white" />
+                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-medium text-white mb-2">
+                  <div className="text-left flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
                       Opening Hours
                     </h3>
-                    <p className="text-white/90 leading-relaxed">
+                    <p className="text-sm sm:text-base text-white/90 leading-relaxed">
                       We accept and deliver orders on weekdays, from 10 AM to 7
                       PM.
                     </p>
@@ -816,34 +819,36 @@ export default function Home() {
                 </div>
 
                 {/* Telephone */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Phone className="h-6 w-6 text-white" />
+                    <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-medium text-white mb-2">
+                  <div className="text-left flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
                       Telephone
                     </h3>
-                    <p className="text-white/90">+44 (0) 20 7123 4567</p>
+                    <p className="text-sm sm:text-base text-white/90 break-all">
+                      +44 (0) 20 7123 4567
+                    </p>
                   </div>
                 </div>
 
                 {/* Email */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Mail className="h-6 w-6 text-white" />
+                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-medium text-white mb-2">
+                  <div className="text-left flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
                       Email
                     </h3>
-                    <p className="text-white/90">
+                    <p className="text-sm sm:text-base text-white/90 break-all">
                       <a
                         href="mailto:enquiries@textileshop.co.uk"
                         className="hover:text-white transition-colors"
