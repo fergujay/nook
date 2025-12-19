@@ -61,20 +61,25 @@ export default function Layout({ children }: LayoutProps) {
   const shouldBeTransparent = isHomePage && !isScrolled;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className={`min-h-screen flex flex-col ${isHomePage && !isScrolled ? '' : 'bg-gray-50'}`}>
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           shouldBeTransparent
-            ? "bg-transparent shadow-none border-none"
+            ? ""
             : "bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100"
         }`}
         style={
           shouldBeTransparent
-            ? { backgroundColor: "transparent", boxShadow: "none", borderBottom: "none" }
+            ? {
+                backgroundColor: "transparent",
+                boxShadow: "none",
+                borderBottom: "none",
+                background: "transparent",
+              }
             : {}
         }
       >
-        <nav 
+        <nav
           className="container-padding"
           style={shouldBeTransparent ? { backgroundColor: "transparent" } : {}}
         >

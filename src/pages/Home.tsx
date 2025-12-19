@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section ref={heroImageRef} className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+      <section ref={heroImageRef} className="relative min-h-[100vh] flex items-center justify-center overflow-hidden" style={{ marginTop: '-80px', paddingTop: '80px' }}>
         {/* Background Image */}
         <div
           className="absolute inset-0"
