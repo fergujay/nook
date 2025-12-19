@@ -24,8 +24,8 @@ export default function Layout({ children }: LayoutProps) {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navigation = [
@@ -57,17 +57,22 @@ export default function Layout({ children }: LayoutProps) {
   }, [languageMenuOpen]);
 
   // Determine if we're on home page at top (for transparent header)
-  const isHomePage = location.pathname === '/';
+  const isHomePage = location.pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <header 
+      <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          shouldBeTransparent 
-            ? 'bg-transparent' 
-            : 'bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100'
+          shouldBeTransparent
+            ? "bg-transparent shadow-none border-none"
+            : "bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100"
         }`}
+        style={
+          shouldBeTransparent
+            ? { backgroundColor: "transparent", boxShadow: "none", borderBottom: "none" }
+            : {}
+        }
       >
         <nav className="container-padding">
           <div className="flex justify-between items-center h-20">
@@ -99,8 +104,8 @@ export default function Layout({ children }: LayoutProps) {
                         ? "text-white"
                         : "text-white/90 hover:text-white"
                       : location.pathname === item.href
-                        ? "text-primary-600"
-                        : "text-gray-700 hover:text-primary-600"
+                      ? "text-primary-600"
+                      : "text-gray-700 hover:text-primary-600"
                   }`}
                 >
                   {item.name}
@@ -125,7 +130,11 @@ export default function Layout({ children }: LayoutProps) {
                       ? "text-white/90 hover:text-white hover:bg-white/10"
                       : ""
                   }`}
-                  style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
+                  style={
+                    shouldBeTransparent
+                      ? {}
+                      : { color: "var(--muted-foreground)" }
+                  }
                   onMouseEnter={(e) => {
                     if (!shouldBeTransparent) {
                       e.currentTarget.style.color = "var(--primary)";
@@ -189,7 +198,11 @@ export default function Layout({ children }: LayoutProps) {
                     ? "text-white/90 hover:text-white hover:bg-white/10"
                     : ""
                 }`}
-                style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
+                style={
+                  shouldBeTransparent
+                    ? {}
+                    : { color: "var(--muted-foreground)" }
+                }
                 onMouseEnter={(e) => {
                   if (!shouldBeTransparent) {
                     e.currentTarget.style.color = "var(--primary)";
@@ -209,8 +222,12 @@ export default function Layout({ children }: LayoutProps) {
                   <span
                     className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md"
                     style={{
-                      backgroundColor: shouldBeTransparent ? "rgba(255, 255, 255, 0.9)" : "var(--primary)",
-                      color: shouldBeTransparent ? "var(--primary)" : "var(--primary-foreground)",
+                      backgroundColor: shouldBeTransparent
+                        ? "rgba(255, 255, 255, 0.9)"
+                        : "var(--primary)",
+                      color: shouldBeTransparent
+                        ? "var(--primary)"
+                        : "var(--primary-foreground)",
                     }}
                   >
                     {totalItems}
@@ -223,7 +240,11 @@ export default function Layout({ children }: LayoutProps) {
                     ? "text-white/90 hover:text-white hover:bg-white/10"
                     : ""
                 }`}
-                style={shouldBeTransparent ? {} : { color: "var(--muted-foreground)" }}
+                style={
+                  shouldBeTransparent
+                    ? {}
+                    : { color: "var(--muted-foreground)" }
+                }
                 onMouseEnter={(e) => {
                   if (!shouldBeTransparent) {
                     e.currentTarget.style.backgroundColor = "var(--muted)";
@@ -248,13 +269,20 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div 
+            <div
               className={`md:hidden py-6 animate-fade-in ${
-                shouldBeTransparent 
-                  ? "border-t border-white/20" 
+                shouldBeTransparent
+                  ? "border-t border-white/20"
                   : "border-t border-gray-200"
               }`}
-              style={shouldBeTransparent ? { backgroundColor: "rgba(0, 0, 0, 0.5)", backdropFilter: "blur(10px)" } : {}}
+              style={
+                shouldBeTransparent
+                  ? {
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      backdropFilter: "blur(10px)",
+                    }
+                  : {}
+              }
             >
               {navigation.map((item) => (
                 <Link
@@ -267,25 +295,27 @@ export default function Layout({ children }: LayoutProps) {
                         ? "text-white border-l-4 border-white pl-4"
                         : "text-white/90 hover:text-white hover:pl-4 transition-all"
                       : location.pathname === item.href
-                        ? "text-primary-600 border-l-4 border-primary-600 pl-4"
-                        : "text-gray-700 hover:text-primary-600 hover:pl-4 transition-all"
+                      ? "text-primary-600 border-l-4 border-primary-600 pl-4"
+                      : "text-gray-700 hover:text-primary-600 hover:pl-4 transition-all"
                   }`}
                 >
                   {item.name}
                 </Link>
               ))}
               {/* Mobile Language Selector */}
-              <div 
+              <div
                 className={`pt-4 mt-4 ${
-                  shouldBeTransparent 
-                    ? "border-t border-white/20" 
+                  shouldBeTransparent
+                    ? "border-t border-white/20"
                     : "border-t border-gray-200"
                 }`}
               >
                 <div className="flex items-center justify-between px-4">
-                  <span className={`text-sm font-medium ${
-                    shouldBeTransparent ? "text-white/90" : "text-gray-700"
-                  }`}>
+                  <span
+                    className={`text-sm font-medium ${
+                      shouldBeTransparent ? "text-white/90" : "text-gray-700"
+                    }`}
+                  >
                     Language
                   </span>
                   <div className="flex gap-2">
