@@ -8,6 +8,7 @@ import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 import { Zoom } from 'yet-another-react-lightbox/plugins'
 import { getAssetPath } from '../utils/images'
+import ImageWithLoader from '../components/ImageWithLoader'
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>()
@@ -101,7 +102,7 @@ export default function ProductDetail() {
             }}
             onClick={() => setIsLightboxOpen(true)}
           >
-            <img
+            <ImageWithLoader
               src={getAssetPath(galleryImages[selectedImage])}
               alt={product.name}
               className="max-w-full max-h-full w-auto h-auto object-contain transition-opacity duration-500 ease-out group-hover:opacity-90"

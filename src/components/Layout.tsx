@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Menu, X, Globe } from "lucide-react";
+import { ShoppingBag, Menu, X, Globe, Plus, Minus, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getAssetPath } from "../utils/images";
+import ImageWithLoader from "./ImageWithLoader";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,11 +13,14 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [cartMenuOpen, setCartMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { totalItems } = useCart();
+  const { totalItems, items, updateQuantity, removeFromCart, totalPrice } =
+    useCart();
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
+  const cartMenuRef = useRef<HTMLDivElement>(null);
 
   // Detect scroll for header styling
   useEffect(() => {
@@ -56,6 +60,39 @@ export default function Layout({ children }: LayoutProps) {
     };
   }, [languageMenuOpen]);
 
+  // Close cart menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        cartMenuRef.current &&
+        !cartMenuRef.current.contains(event.target as Node)
+      ) {
+        setCartMenuOpen(false);
+      }
+    };
+
+    if (cartMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [cartMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   // Determine if we're on home page at top (for transparent header)
   const isHomePage = location.pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled && !mobileMenuOpen;
@@ -67,7 +104,9 @@ export default function Layout({ children }: LayoutProps) {
       }`}
     >
       <header
-        className={`sticky top-0 z-50 w-full ${
+        className={`sticky top-0 w-full ${
+          mobileMenuOpen ? "z-[101]" : "z-50"
+        } ${
           shouldBeTransparent
             ? ""
             : "bg-white/95 backdrop-blur-sm shadow-soft border-b border-gray-100"
@@ -79,19 +118,22 @@ export default function Layout({ children }: LayoutProps) {
                 boxShadow: "none",
                 borderBottom: "none",
                 background: "transparent",
-                transition: "background-color 0.3s ease, box-shadow 0.3s ease, border-bottom 0.3s ease",
+                transition:
+                  "background-color 0.3s ease, box-shadow 0.3s ease, border-bottom 0.3s ease",
               }
             : mobileMenuOpen
             ? {
                 backgroundColor: "rgba(55, 55, 55, 0.95)",
                 backdropFilter: "blur(10px)",
                 borderBottom: "none",
-                transition: "background-color 0.2s ease, backdrop-filter 0.2s ease",
+                transition:
+                  "background-color 0.2s ease, backdrop-filter 0.2s ease",
               }
             : {
                 backgroundColor: "rgba(255, 255, 255, 0.95)",
                 backdropFilter: "blur(8px)",
-                transition: "background-color 0.2s ease, backdrop-filter 0.2s ease",
+                transition:
+                  "background-color 0.2s ease, backdrop-filter 0.2s ease",
               }
         }
       >
@@ -225,9 +267,217 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                 )}
               </div>
+              {/* Shopping Cart - Floating Menu for Desktop, Link for Mobile */}
+              <div className="relative hidden md:block" ref={cartMenuRef}>
+                <button
+                  onClick={() => setCartMenuOpen(!cartMenuOpen)}
+                  className={`relative p-2.5 transition-all duration-200 ${
+                    shouldBeTransparent && !mobileMenuOpen
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : mobileMenuOpen
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : ""
+                  }`}
+                  style={
+                    shouldBeTransparent && !mobileMenuOpen
+                      ? {}
+                      : mobileMenuOpen
+                      ? {}
+                      : { color: "var(--muted-foreground)" }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!shouldBeTransparent && !mobileMenuOpen) {
+                      e.currentTarget.style.color = "var(--primary)";
+                      e.currentTarget.style.backgroundColor = "var(--muted)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!shouldBeTransparent && !mobileMenuOpen) {
+                      e.currentTarget.style.color = "var(--muted-foreground)";
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }
+                  }}
+                  aria-label={t("cart")}
+                >
+                  {cartMenuOpen ? (
+                    <X className="h-6 w-6" />
+                  ) : (
+                    <>
+                      <ShoppingBag className="h-6 w-6" />
+                      {totalItems > 0 && (
+                        <span
+                          className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md rounded-full"
+                          style={{
+                            backgroundColor:
+                              shouldBeTransparent || mobileMenuOpen
+                                ? "rgba(255, 255, 255, 0.9)"
+                                : "var(--primary)",
+                            color:
+                              shouldBeTransparent || mobileMenuOpen
+                                ? "var(--primary)"
+                                : "var(--primary-foreground)",
+                          }}
+                        >
+                          {totalItems}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </button>
+                {cartMenuOpen && (
+                  <div
+                    className="absolute w-96 max-h-[600px] shadow-lg border z-50 overflow-hidden flex flex-col"
+                    style={{
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
+                      right: 0,
+                      marginTop: isScrolled ? "4rem" : "1rem",
+                      transition: "margin-top 0.3s ease-in-out",
+                    }}
+                  >
+                    <div
+                      className="p-4 border-b"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      <h3
+                        className="font-semibold text-lg"
+                        style={{ color: "var(--foreground)" }}
+                      >
+                        {t("cart")} ({totalItems})
+                      </h3>
+                    </div>
+                    {items.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <ShoppingBag
+                          className="h-12 w-12 mx-auto mb-4 opacity-50"
+                          style={{ color: "var(--muted-foreground)" }}
+                        />
+                        <p
+                          className="text-sm"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          Your cart is empty
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="overflow-y-auto flex-1 max-h-[400px]">
+                          <div className="p-4 space-y-4">
+                            {items.map((item) => (
+                              <div
+                                key={item.id}
+                                className="flex gap-3 pb-4 border-b last:border-b-0 last:pb-0"
+                                style={{ borderColor: "var(--border)" }}
+                              >
+                                <ImageWithLoader
+                                  src={getAssetPath(item.image)}
+                                  alt={item.name}
+                                  className="w-16 h-16 object-cover flex-shrink-0"
+                                />
+                                <div className="flex-grow min-w-0">
+                                  <h4
+                                    className="font-medium text-sm mb-1 truncate"
+                                    style={{ color: "var(--foreground)" }}
+                                  >
+                                    {item.name}
+                                  </h4>
+                                  <p
+                                    className="text-sm font-semibold mb-2"
+                                    style={{ color: "var(--primary)" }}
+                                  >
+                                    ${item.price.toFixed(2)}
+                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="flex items-center gap-1 border rounded"
+                                      style={{ borderColor: "var(--border)" }}
+                                    >
+                                      <button
+                                        onClick={() =>
+                                          updateQuantity(
+                                            item.id,
+                                            item.quantity - 1
+                                          )
+                                        }
+                                        className="p-1 hover:bg-gray-100 transition-colors"
+                                        style={{ color: "var(--foreground)" }}
+                                      >
+                                        <Minus className="h-3 w-3" />
+                                      </button>
+                                      <span
+                                        className="px-2 py-1 text-xs font-semibold min-w-[2rem] text-center"
+                                        style={{ color: "var(--foreground)" }}
+                                      >
+                                        {item.quantity}
+                                      </span>
+                                      <button
+                                        onClick={() =>
+                                          updateQuantity(
+                                            item.id,
+                                            item.quantity + 1
+                                          )
+                                        }
+                                        className="p-1 hover:bg-gray-100 transition-colors"
+                                        style={{ color: "var(--foreground)" }}
+                                      >
+                                        <Plus className="h-3 w-3" />
+                                      </button>
+                                    </div>
+                                    <button
+                                      onClick={() => removeFromCart(item.id)}
+                                      className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors ml-auto"
+                                      aria-label="Remove item"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div
+                          className="p-4 border-t space-y-3"
+                          style={{ borderColor: "var(--border)" }}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span
+                              className="font-semibold"
+                              style={{ color: "var(--foreground)" }}
+                            >
+                              Total:
+                            </span>
+                            <span
+                              className="font-bold text-lg"
+                              style={{ color: "var(--primary)" }}
+                            >
+                              ${totalPrice.toFixed(2)}
+                            </span>
+                          </div>
+                          <Link
+                            to="/checkout"
+                            onClick={() => setCartMenuOpen(false)}
+                            className="btn-primary w-full text-center block"
+                          >
+                            Checkout
+                          </Link>
+                          <Link
+                            to="/cart"
+                            onClick={() => setCartMenuOpen(false)}
+                            className="btn-secondary w-full text-center block"
+                          >
+                            View Cart
+                          </Link>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              {/* Mobile Cart Link */}
               <Link
                 to="/cart"
-                className={`relative p-2.5 transition-all duration-200 ${
+                className={`relative md:hidden p-2.5 transition-all duration-200 ${
                   shouldBeTransparent && !mobileMenuOpen
                     ? "text-white/90 hover:text-white hover:bg-white/10"
                     : mobileMenuOpen
@@ -258,7 +508,7 @@ export default function Layout({ children }: LayoutProps) {
                 <ShoppingBag className="h-6 w-6" />
                 {totalItems > 0 && (
                   <span
-                    className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md"
+                    className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md rounded-full"
                     style={{
                       backgroundColor:
                         shouldBeTransparent || mobileMenuOpen
@@ -312,109 +562,127 @@ export default function Layout({ children }: LayoutProps) {
               </button>
             </div>
           </div>
+        </nav>
+      </header>
 
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div
-              className="md:hidden py-6 border-t border-white/20"
+      {/* Mobile Navigation - Fullscreen Section */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed z-[100] overflow-y-auto"
+          style={{
+            animation: "fadeIn 0.2s ease-in-out",
+            top: "5rem",
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          {/* Video Background */}
+          <div className="absolute inset-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
               style={{
-                backgroundColor: "rgba(55, 55, 55, 0.98)",
-                backdropFilter: "blur(10px)",
-                animation: "fadeIn 0.2s ease-in-out",
+                pointerEvents: "none",
               }}
-            >
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block py-3 text-base font-medium transition-colors ${
-                    location.pathname === item.href
-                      ? "text-white border-l-4 border-white pl-4"
-                      : "text-white/90 hover:text-white hover:pl-4 transition-all"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              {/* Mobile Language Selector */}
-              <div className="pt-4 mt-4 border-t border-white/20">
-                <div className="flex items-center justify-between px-4">
-                  <span className="text-sm font-medium text-white/90">
-                    Language
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setLanguage("en");
-                        setMobileMenuOpen(false);
-                      }}
-                      className="px-3 py-1.5 text-sm transition-colors"
-                      style={
-                        language === "en"
-                          ? {
-                              backgroundColor: "var(--primary)",
-                              color: "var(--primary-foreground)",
-                            }
-                          : {
-                              backgroundColor: "var(--muted)",
-                              color: "var(--muted-foreground)",
-                            }
+              src={getAssetPath("videos/mobile-menu-background.mp4")}
+            />
+            {/* Dark overlay for better text readability */}
+            <div className="absolute inset-0 bg-black/50"></div>
+          </div>
+
+          {/* Navigation Content */}
+          <div className="relative z-10 py-6 px-4 min-h-full flex flex-col">
+            {navigation.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block py-3 text-base font-medium transition-colors ${
+                  location.pathname === item.href
+                    ? "text-white border-l-4 border-white pl-4"
+                    : "text-white/90 hover:text-white hover:pl-4 transition-all"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {/* Mobile Language Selector */}
+            <div className="pt-4 mt-4 border-t border-white/20">
+              <div className="flex items-center justify-between px-4">
+                <span className="text-sm font-medium text-white/90">
+                  Language
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setLanguage("en");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-1.5 text-sm transition-colors"
+                    style={
+                      language === "en"
+                        ? {
+                            backgroundColor: "var(--primary)",
+                            color: "var(--primary-foreground)",
+                          }
+                        : {
+                            backgroundColor: "var(--muted)",
+                            color: "var(--muted-foreground)",
+                          }
+                    }
+                    onMouseEnter={(e) => {
+                      if (language !== "en") {
+                        e.currentTarget.style.backgroundColor = "var(--border)";
                       }
-                      onMouseEnter={(e) => {
-                        if (language !== "en") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--border)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (language !== "en") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--muted)";
-                        }
-                      }}
-                    >
-                      EN
-                    </button>
-                    <button
-                      onClick={() => {
-                        setLanguage("sr");
-                        setMobileMenuOpen(false);
-                      }}
-                      className="px-3 py-1.5 text-sm transition-colors"
-                      style={
-                        language === "sr"
-                          ? {
-                              backgroundColor: "var(--primary)",
-                              color: "var(--primary-foreground)",
-                            }
-                          : {
-                              backgroundColor: "var(--muted)",
-                              color: "var(--muted-foreground)",
-                            }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (language !== "en") {
+                        e.currentTarget.style.backgroundColor = "var(--muted)";
                       }
-                      onMouseEnter={(e) => {
-                        if (language !== "sr") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--border)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (language !== "sr") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--muted)";
-                        }
-                      }}
-                    >
-                      SR
-                    </button>
-                  </div>
+                    }}
+                  >
+                    EN
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLanguage("sr");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-1.5 text-sm transition-colors"
+                    style={
+                      language === "sr"
+                        ? {
+                            backgroundColor: "var(--primary)",
+                            color: "var(--primary-foreground)",
+                          }
+                        : {
+                            backgroundColor: "var(--muted)",
+                            color: "var(--muted-foreground)",
+                          }
+                    }
+                    onMouseEnter={(e) => {
+                      if (language !== "sr") {
+                        e.currentTarget.style.backgroundColor = "var(--border)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (language !== "sr") {
+                        e.currentTarget.style.backgroundColor = "var(--muted)";
+                      }
+                    }}
+                  >
+                    SR
+                  </button>
                 </div>
               </div>
             </div>
-          )}
-        </nav>
-      </header>
+          </div>
+        </div>
+      )}
 
       <main className="flex-grow">{children}</main>
 

@@ -10,6 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
+import ImageWithLoader from "../components/ImageWithLoader";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -366,12 +367,11 @@ export default function Home() {
                   willChange: isDragging ? "transform" : "auto",
                 }}
               >
-                <img
+                <ImageWithLoader
                   src={getAssetPath(image)}
                   alt={`Hero slide ${index + 1}`}
                   className="w-full h-full object-cover"
                   style={{ minHeight: "120%", pointerEvents: "none" }}
-                  draggable={false}
                 />
               </div>
             );
@@ -582,12 +582,11 @@ export default function Home() {
                           zIndex: isProductActive ? 1 : 0,
                         }}
                       >
-                        <img
+                        <ImageWithLoader
                           src={getAssetPath(product.image)}
                           alt={product.name}
                           className="w-full h-full object-cover"
                           style={{ pointerEvents: "none" }}
-                          draggable={false}
                         />
                       </div>
                     );

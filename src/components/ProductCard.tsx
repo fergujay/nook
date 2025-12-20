@@ -3,6 +3,7 @@ import { ShoppingCart } from 'lucide-react'
 import { Product } from '../data/products'
 import { useCart } from '../contexts/CartContext'
 import { getAssetPath } from '../utils/images'
+import ImageWithLoader from './ImageWithLoader'
 
 interface ProductCardProps {
   product: Product
@@ -29,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="flex flex-col h-full"
       >
         <div className="relative aspect-[3/2] overflow-hidden border-b" style={{ backgroundColor: 'var(--muted)', borderColor: 'var(--border)' }}>
-          <img
+          <ImageWithLoader
             src={getAssetPath(product.image)}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
