@@ -5,6 +5,7 @@ import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getAssetPath } from "../utils/images";
 import ImageWithLoader from "./ImageWithLoader";
+import { products } from "../data/products";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,6 +22,36 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const cartMenuRef = useRef<HTMLDivElement>(null);
+
+  // Track last page visited for back navigation
+  useEffect(() => {
+    // Use navigation items for consistent naming
+    const pageNames: { [key: string]: string } = {
+      '/': t('home'),
+      '/products': t('products'),
+      '/about': t('aboutUs'),
+      '/textile-care': t('textileCare'),
+      '/courier': t('courier'),
+      '/cart': t('cart'),
+      '/checkout': 'Checkout',
+    }
+    
+    // Track product detail pages with product name and description
+    if (location.pathname.startsWith('/products/')) {
+      const productId = location.pathname.split('/products/')[1]
+      const product = products.find(p => p.id === productId)
+      if (product) {
+        localStorage.setItem('lastPageVisited', `${product.name} (${product.description})`)
+        localStorage.setItem('lastPagePath', '/products')
+      }
+    }
+    // Don't track products page itself, but track other pages
+    else if (location.pathname !== '/products') {
+      const pageName = pageNames[location.pathname] || t('home')
+      localStorage.setItem('lastPageVisited', pageName)
+      localStorage.setItem('lastPagePath', location.pathname)
+    }
+  }, [location.pathname, t])
 
   // Detect scroll for header styling
   useEffect(() => {
@@ -566,8 +597,8 @@ export default function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Mobile Navigation - Fullscreen Section */}
-      {mobileMenuOpen && (
-        <div
+          {mobileMenuOpen && (
+            <div
           className="md:hidden fixed z-[100] overflow-y-auto"
           style={{
             animation: "fadeIn 0.2s ease-in-out",
@@ -596,93 +627,93 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Navigation Content */}
           <div className="relative z-10 py-6 px-4 min-h-full flex flex-col">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block py-3 text-base font-medium transition-colors ${
-                  location.pathname === item.href
-                    ? "text-white border-l-4 border-white pl-4"
-                    : "text-white/90 hover:text-white hover:pl-4 transition-all"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-            {/* Mobile Language Selector */}
-            <div className="pt-4 mt-4 border-t border-white/20">
-              <div className="flex items-center justify-between px-4">
-                <span className="text-sm font-medium text-white/90">
-                  Language
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setLanguage("en");
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-3 py-1.5 text-sm transition-colors"
-                    style={
-                      language === "en"
-                        ? {
-                            backgroundColor: "var(--primary)",
-                            color: "var(--primary-foreground)",
-                          }
-                        : {
-                            backgroundColor: "var(--muted)",
-                            color: "var(--muted-foreground)",
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (language !== "en") {
+              {navigation.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block py-3 text-base font-medium transition-colors ${
+                    location.pathname === item.href
+                      ? "text-white border-l-4 border-white pl-4"
+                      : "text-white/90 hover:text-white hover:pl-4 transition-all"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              {/* Mobile Language Selector */}
+              <div className="pt-4 mt-4 border-t border-white/20">
+                <div className="flex items-center justify-between px-4">
+                  <span className="text-sm font-medium text-white/90">
+                    Language
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setLanguage("en");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="px-3 py-1.5 text-sm transition-colors"
+                      style={
+                        language === "en"
+                          ? {
+                              backgroundColor: "var(--primary)",
+                              color: "var(--primary-foreground)",
+                            }
+                          : {
+                              backgroundColor: "var(--muted)",
+                              color: "var(--muted-foreground)",
+                            }
+                      }
+                      onMouseEnter={(e) => {
+                        if (language !== "en") {
                         e.currentTarget.style.backgroundColor = "var(--border)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (language !== "en") {
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (language !== "en") {
                         e.currentTarget.style.backgroundColor = "var(--muted)";
+                        }
+                      }}
+                    >
+                      EN
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLanguage("sr");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="px-3 py-1.5 text-sm transition-colors"
+                      style={
+                        language === "sr"
+                          ? {
+                              backgroundColor: "var(--primary)",
+                              color: "var(--primary-foreground)",
+                            }
+                          : {
+                              backgroundColor: "var(--muted)",
+                              color: "var(--muted-foreground)",
+                            }
                       }
-                    }}
-                  >
-                    EN
-                  </button>
-                  <button
-                    onClick={() => {
-                      setLanguage("sr");
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-3 py-1.5 text-sm transition-colors"
-                    style={
-                      language === "sr"
-                        ? {
-                            backgroundColor: "var(--primary)",
-                            color: "var(--primary-foreground)",
-                          }
-                        : {
-                            backgroundColor: "var(--muted)",
-                            color: "var(--muted-foreground)",
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (language !== "sr") {
+                      onMouseEnter={(e) => {
+                        if (language !== "sr") {
                         e.currentTarget.style.backgroundColor = "var(--border)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (language !== "sr") {
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (language !== "sr") {
                         e.currentTarget.style.backgroundColor = "var(--muted)";
-                      }
-                    }}
-                  >
-                    SR
-                  </button>
+                        }
+                      }}
+                    >
+                      SR
+                    </button>
+                </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
       <main className="flex-grow">{children}</main>
 
@@ -720,37 +751,17 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Middle Column - QUICK LINKS */}
             <div>
-              <h3
-                className="text-sm font-medium mb-4 uppercase"
-                style={{ color: "#d3d3d3" }}
-              >
-                QUICK LINKS
-              </h3>
               <ul className="space-y-2 text-sm" style={{ color: "#d3d3d3" }}>
-                <li>
-                  <Link
-                    to="/products"
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    Our Collection
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/about"
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/about"
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    Visit Our Atelier
-                  </Link>
-                </li>
+                {navigation.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      to={item.href}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 

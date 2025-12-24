@@ -30,7 +30,7 @@ export default function ImageWithLoader({
   };
 
   return (
-    <div className="relative w-full h-full" style={style}>
+    <div className="relative w-full h-full">
       {isLoading && !hasError && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <ClothLoader size="md" />
