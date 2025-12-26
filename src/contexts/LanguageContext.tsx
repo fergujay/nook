@@ -26,7 +26,6 @@ const translations = {
     orders: 'Orders',
     login: 'Login',
     logout: 'Logout',
-    myOrders: 'My Orders',
     signIn: 'Sign In',
     signUp: 'Sign Up',
     
@@ -296,7 +295,6 @@ const translations = {
     orders: 'Porudžbine',
     login: 'Prijava',
     logout: 'Odjava',
-    myOrders: 'Moje porudžbine',
     signIn: 'Prijavi se',
     signUp: 'Registruj se',
     

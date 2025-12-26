@@ -3,6 +3,7 @@ import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { useCart } from '../contexts/CartContext'
 import { useLanguage } from '../contexts/LanguageContext'
+import { products } from '../data/products'
 import { getAssetPath } from '../utils/images'
 
 export default function Favorites() {
@@ -56,7 +57,13 @@ export default function Favorites() {
               </p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => addToCart(item)}
+                  onClick={() => {
+                    // Find the full product from products data
+                    const fullProduct = products.find(p => p.id === item.id);
+                    if (fullProduct) {
+                      addToCart(fullProduct);
+                    }
+                  }}
                   className="flex-1 btn-primary flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="h-4 w-4" />

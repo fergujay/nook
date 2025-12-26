@@ -4,9 +4,9 @@ import { CreditCard, MapPin, Loader2 } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
-import { createPaymentIntent, confirmPayment, TEST_CARDS } from '../services/paymentService'
+import { createPaymentIntent, confirmPayment } from '../services/paymentService'
 import { sendFiscalReceipt, calculateVAT, type FiscalReceiptItem, formatFiscalReceipt } from '../services/fiscalService'
-import { sendOrderConfirmationEmail, generateOrderEmailHTML, generateOrderEmailText, type OrderEmailData } from '../services/emailService'
+import { sendOrderConfirmationEmail, type OrderEmailData } from '../services/emailService'
 import { saveOrder } from '../services/orderService'
 
 export default function Checkout() {
@@ -67,7 +67,6 @@ export default function Checkout() {
       // Step 3: Prepare fiscal receipt items
       const fiscalItems: FiscalReceiptItem[] = items.map(item => {
         const itemTotal = item.price * item.quantity
-        const itemVAT = calculateVAT(itemTotal, 20)
         return {
           name: item.name,
           quantity: item.quantity,

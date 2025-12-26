@@ -5,8 +5,8 @@
  * Test cards: https://stripe.com/docs/testing
  */
 
-const STRIPE_TEST_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QExampleKeyForSerbia';
-const STRIPE_API_URL = 'https://api.stripe.com/v1';
+// const STRIPE_TEST_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QExampleKeyForSerbia';
+// const STRIPE_API_URL = 'https://api.stripe.com/v1';
 
 export interface PaymentIntent {
   id: string;
@@ -124,9 +124,9 @@ export async function confirmPayment(
  * Mock Payment Intent for test mode
  */
 function createMockPaymentIntent(
-  amount: number,
-  currency: string,
-  metadata?: Record<string, string>
+  _amount: number,
+  _currency: string,
+  _metadata?: Record<string, string>
 ): PaymentResponse {
   // Simulate API delay
   const paymentIntentId = `pi_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
