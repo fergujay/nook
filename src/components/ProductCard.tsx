@@ -19,8 +19,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   )
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
-  const desktopIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const mobileIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const desktopIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mobileIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mobileSlideRef = useRef<number>(0)
   const cardRef = useRef<HTMLDivElement>(null)
   
