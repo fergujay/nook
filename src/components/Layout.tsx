@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Menu, X, Globe, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingBag, Menu, X, Globe, Plus, Minus, Trash2, User, LogOut, Package } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useAuth } from "../contexts/AuthContext";
 import { getAssetPath } from "../utils/images";
 import ImageWithLoader from "./ImageWithLoader";
 import { products } from "../data/products";
@@ -19,6 +20,7 @@ export default function Layout({ children }: LayoutProps) {
   const { totalItems, items, updateQuantity, removeFromCart, totalPrice } =
     useCart();
   const { language, setLanguage, t } = useLanguage();
+  const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const cartMenuRef = useRef<HTMLDivElement>(null);
@@ -33,7 +35,7 @@ export default function Layout({ children }: LayoutProps) {
       '/textile-care': t('textileCare'),
       '/courier': t('courier'),
       '/cart': t('cart'),
-      '/checkout': 'Checkout',
+      '/checkout': t('checkout'),
     }
     
     // Track product detail pages with product name and description
@@ -298,6 +300,116 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                 )}
               </div>
+              
+              {/* User Account / Login */}
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/orders"
+                    className={`p-2.5 transition-all duration-200 ${
+                      shouldBeTransparent && !mobileMenuOpen
+                        ? "text-white/90 hover:text-white hover:bg-white/10"
+                        : mobileMenuOpen
+                        ? "text-white/90 hover:text-white hover:bg-white/10"
+                        : ""
+                    }`}
+                    style={
+                      shouldBeTransparent && !mobileMenuOpen
+                        ? {}
+                        : mobileMenuOpen
+                        ? {}
+                        : { color: "var(--muted-foreground)" }
+                    }
+                    onMouseEnter={(e) => {
+                      if (!shouldBeTransparent && !mobileMenuOpen) {
+                        e.currentTarget.style.color = "var(--primary)";
+                        e.currentTarget.style.backgroundColor = "var(--muted)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!shouldBeTransparent && !mobileMenuOpen) {
+                        e.currentTarget.style.color = "var(--muted-foreground)";
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }
+                    }}
+                    aria-label={t('myOrders')}
+                  >
+                    <Package className="h-5 w-5" />
+                  </Link>
+                  <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ backgroundColor: "var(--muted)" }}>
+                    <User className="h-4 w-4" style={{ color: "var(--muted-foreground)" }} />
+                    <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                      {user?.name}
+                    </span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className={`p-2.5 transition-all duration-200 ${
+                      shouldBeTransparent && !mobileMenuOpen
+                        ? "text-white/90 hover:text-white hover:bg-white/10"
+                        : mobileMenuOpen
+                        ? "text-white/90 hover:text-white hover:bg-white/10"
+                        : ""
+                    }`}
+                    style={
+                      shouldBeTransparent && !mobileMenuOpen
+                        ? {}
+                        : mobileMenuOpen
+                        ? {}
+                        : { color: "var(--muted-foreground)" }
+                    }
+                    onMouseEnter={(e) => {
+                      if (!shouldBeTransparent && !mobileMenuOpen) {
+                        e.currentTarget.style.color = "var(--primary)";
+                        e.currentTarget.style.backgroundColor = "var(--muted)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!shouldBeTransparent && !mobileMenuOpen) {
+                        e.currentTarget.style.color = "var(--muted-foreground)";
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }
+                    }}
+                    aria-label={t('logout')}
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className={`p-2.5 transition-all duration-200 ${
+                    shouldBeTransparent && !mobileMenuOpen
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : mobileMenuOpen
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : ""
+                  }`}
+                  style={
+                    shouldBeTransparent && !mobileMenuOpen
+                      ? {}
+                      : mobileMenuOpen
+                      ? {}
+                      : { color: "var(--muted-foreground)" }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!shouldBeTransparent && !mobileMenuOpen) {
+                      e.currentTarget.style.color = "var(--primary)";
+                      e.currentTarget.style.backgroundColor = "var(--muted)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!shouldBeTransparent && !mobileMenuOpen) {
+                      e.currentTarget.style.color = "var(--muted-foreground)";
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }
+                  }}
+                  aria-label={t('login')}
+                >
+                  <User className="h-5 w-5" />
+                </Link>
+              )}
+              
               {/* Shopping Cart - Floating Menu for Desktop, Link for Mobile */}
               <div className="relative hidden md:block" ref={cartMenuRef}>
                 <button
@@ -416,7 +528,7 @@ export default function Layout({ children }: LayoutProps) {
                                     className="text-sm font-semibold mb-2"
                                     style={{ color: "var(--primary)" }}
                                   >
-                                    ${item.price.toFixed(2)}
+                                    {item.price.toLocaleString('sr-RS')} RSD
                                   </p>
                                   <div className="flex items-center gap-2">
                                     <div
@@ -482,7 +594,7 @@ export default function Layout({ children }: LayoutProps) {
                               className="font-bold text-lg"
                               style={{ color: "var(--primary)" }}
                             >
-                              ${totalPrice.toFixed(2)}
+                              {totalPrice.toLocaleString('sr-RS')} RSD
                             </span>
                           </div>
                           <Link
@@ -490,7 +602,7 @@ export default function Layout({ children }: LayoutProps) {
                             onClick={() => setCartMenuOpen(false)}
                             className="btn-primary w-full text-center block"
                           >
-                            Checkout
+                            {t('checkout')}
                           </Link>
                           <Link
                             to="/cart"
@@ -641,6 +753,44 @@ export default function Layout({ children }: LayoutProps) {
                   {item.name}
                 </Link>
               ))}
+              {/* Mobile Auth Section */}
+              <div className="pt-4 mt-4 border-t border-white/20">
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/orders"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 transition-all"
+                    >
+                      <Package className="h-5 w-5" />
+                      <span>{t('myOrders')}</span>
+                    </Link>
+                    <div className="px-4 py-2 text-white/70 text-sm">
+                      {user?.name}
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 transition-all w-full text-left"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span>{t('logout')}</span>
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 transition-all"
+                  >
+                    <User className="h-5 w-5" />
+                    <span>{t('signIn')}</span>
+                  </Link>
+                )}
+              </div>
+              
               {/* Mobile Language Selector */}
               <div className="pt-4 mt-4 border-t border-white/20">
                 <div className="flex items-center justify-between px-4">

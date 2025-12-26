@@ -1,124 +1,231 @@
 import { Mail, Phone, MapPin, Heart, Users, Award } from "lucide-react";
+import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function About() {
+  const { t } = useLanguage();
+  const [isMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 768
+  );
+
   return (
-    <div className="max-w-7xl mx-auto container-padding py-16">
-      <div className="text-center mb-20">
-        <h1 className="heading-medium mb-6">About Us</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          We are passionate about bringing you the finest textiles for your
-          home, combining quality craftsmanship with sustainable practices.
-        </p>
-      </div>
+    <div className="w-full">
+      {/* Hero Section */}
+      <section className="section-padding w-full relative bg-white">
+        <div className="max-w-7xl mx-auto container-padding text-center">
+          <p
+            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
+            style={{
+              color: "var(--muted-foreground)",
+              letterSpacing: isMobile ? "4px" : "6px",
+            }}
+          >
+            {t('ourStory')}
+          </p>
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
+            style={{ color: "var(--foreground)" }}
+          >
+            {t('aboutUsTitle')}
+          </h1>
+          <p
+            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            {t('aboutUsDescription')}
+          </p>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
-        <div className="text-center group">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary-100 text-primary-600 mb-6 group-hover:bg-primary-200 transition-colors duration-300 shadow-soft">
-            <Heart className="h-10 w-10" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3">Our Mission</h3>
-          <p className="text-gray-600 leading-relaxed">
-            To provide premium quality textiles that enhance your living spaces
-            while respecting our planet.
-          </p>
-        </div>
-        <div className="text-center group">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary-100 text-primary-600 mb-6 group-hover:bg-primary-200 transition-colors duration-300 shadow-soft">
-            <Users className="h-10 w-10" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3">Our Team</h3>
-          <p className="text-gray-600 leading-relaxed">
-            A dedicated team of textile experts and designers committed to
-            excellence.
-          </p>
-        </div>
-        <div className="text-center group">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary-100 text-primary-600 mb-6 group-hover:bg-primary-200 transition-colors duration-300 shadow-soft">
-            <Award className="h-10 w-10" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3">Quality Promise</h3>
-          <p className="text-gray-600 leading-relaxed">
-            Every product is carefully selected and tested to meet our high
-            standards.
-          </p>
-        </div>
-      </div>
-
-      <div className="card mb-16">
-        <h2 className="heading-medium mb-8">Our Story</h2>
-        <div className="prose prose-lg max-w-none text-gray-700 space-y-6 leading-relaxed">
-          <p className="text-lg">
-            Founded with a vision to transform homes through exceptional
-            textiles, Nook has been serving customers with passion and
-            dedication. We believe that the right textiles can transform any
-            space into a sanctuary of comfort and style.
-          </p>
-          <p className="text-lg">
-            Our journey began with a simple idea: to make premium quality
-            textiles accessible to everyone. We source our materials from
-            trusted suppliers who share our commitment to sustainability and
-            ethical practices.
-          </p>
-          <p className="text-lg">
-            Today, we continue to grow and evolve, always staying true to our
-            core values of quality, sustainability, and customer satisfaction.
-          </p>
-        </div>
-      </div>
-
-      <div className="card">
-        <h2 className="heading-medium mb-8">Contact Us</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex items-start gap-4">
-            <div className="p-4 bg-primary-100 rounded-xl shadow-soft">
-              <Mail className="h-6 w-6 text-primary-600" />
+      {/* Values Section */}
+      <section className="section-padding w-full relative bg-white">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-6 transition-transform duration-300 group-hover:scale-110">
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "white",
+                  }}
+                >
+                  <Heart className="h-8 w-8 sm:h-10 sm:w-10" />
+                </div>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-medium mb-3 sm:mb-4" style={{ color: "var(--foreground)" }}>
+                {t('ourMission')}
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                {t('ourMissionText')}
+              </p>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2 text-lg">Email</h3>
-              <a
-                href="mailto:info@nook.com"
-                className="text-gray-600 hover:text-primary-600 transition-colors block"
-              >
-                info@nook.com
-              </a>
-              <a
-                href="mailto:support@nook.com"
-                className="text-gray-600 hover:text-primary-600 transition-colors block"
-              >
-                support@nook.com
-              </a>
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-6 transition-transform duration-300 group-hover:scale-110">
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "white",
+                  }}
+                >
+                  <Users className="h-8 w-8 sm:h-10 sm:w-10" />
+                </div>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-medium mb-3 sm:mb-4" style={{ color: "var(--foreground)" }}>
+                {t('ourTeam')}
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                {t('ourTeamText')}
+              </p>
             </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="p-4 bg-primary-100 rounded-xl shadow-soft">
-              <Phone className="h-6 w-6 text-primary-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2 text-lg">Phone</h3>
-              <a
-                href="tel:+381111234567"
-                className="text-gray-600 hover:text-primary-600 transition-colors block"
-              >
-                +381 11 123 4567
-              </a>
-              <p className="text-gray-600 text-sm mt-1">Mon-Fri: 9AM-6PM</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="p-4 bg-primary-100 rounded-xl shadow-soft">
-              <MapPin className="h-6 w-6 text-primary-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2 text-lg">Address</h3>
-              <p className="text-gray-600">
-                123 Textile Street
-                <br />
-                Belgrade, Serbia
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-6 transition-transform duration-300 group-hover:scale-110">
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "white",
+                  }}
+                >
+                  <Award className="h-8 w-8 sm:h-10 sm:w-10" />
+                </div>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-medium mb-3 sm:mb-4" style={{ color: "var(--foreground)" }}>
+                {t('qualityPromise')}
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                {t('qualityPromiseText')}
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Story Section */}
+      <section className="section-padding w-full relative" style={{ backgroundColor: "var(--muted)" }}>
+        <div className="max-w-4xl mx-auto container-padding">
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight mb-8 sm:mb-12"
+            style={{ color: "var(--foreground)" }}
+          >
+            {t('ourStoryTitle')}
+          </h2>
+          <div className="space-y-6 sm:space-y-8">
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              {t('ourStoryText1')}
+            </p>
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              {t('ourStoryText2')}
+            </p>
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              {t('ourStoryText3')}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="section-padding w-full relative bg-white">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="text-center mb-12 sm:mb-16">
+            <p
+              className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium"
+              style={{
+                color: "var(--muted-foreground)",
+                letterSpacing: isMobile ? "4px" : "6px",
+              }}
+            >
+              {t('getInTouch')}
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight"
+              style={{ color: "var(--foreground)" }}
+            >
+              {t('contactUs')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div
+                className="p-4 sm:p-6 flex-shrink-0"
+                style={{
+                  backgroundColor: "var(--primary)",
+                  color: "white",
+                }}
+              >
+                <Mail className="h-6 w-6 sm:h-7 sm:w-7" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3" style={{ color: "var(--foreground)" }}>
+                  {t('emailLabel')}
+                </h3>
+                <a
+                  href="mailto:info@nook.com"
+                  className="text-base sm:text-lg block mb-1 hover:opacity-70 transition-opacity"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  info@nook.com
+                </a>
+                <a
+                  href="mailto:support@nook.com"
+                  className="text-base sm:text-lg block hover:opacity-70 transition-opacity"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  support@nook.com
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div
+                className="p-4 sm:p-6 flex-shrink-0"
+                style={{
+                  backgroundColor: "var(--primary)",
+                  color: "white",
+                }}
+              >
+                <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3" style={{ color: "var(--foreground)" }}>
+                  {t('phoneLabel')}
+                </h3>
+                <a
+                  href="tel:+381111234567"
+                  className="text-base sm:text-lg block mb-1 hover:opacity-70 transition-opacity"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  +381 11 123 4567
+                </a>
+                <p className="text-sm sm:text-base" style={{ color: "var(--muted-foreground)" }}>
+                  {t('monFri')}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div
+                className="p-4 sm:p-6 flex-shrink-0"
+                style={{
+                  backgroundColor: "var(--primary)",
+                  color: "white",
+                }}
+              >
+                <MapPin className="h-6 w-6 sm:h-7 sm:w-7" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3" style={{ color: "var(--foreground)" }}>
+                  {t('addressLabel')}
+                </h3>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                  123 Textile Street
+                  <br />
+                  Belgrade, Serbia
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

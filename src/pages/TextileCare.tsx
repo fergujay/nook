@@ -1,116 +1,209 @@
 import { Droplet, Sun, Shirt, Wind } from "lucide-react";
+import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function TextileCare() {
+  const { t } = useLanguage();
+  const [isMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 768
+  );
+
   const careTips = [
     {
       icon: Droplet,
-      title: "Washing",
+      title: t('washing'),
       tips: [
-        "Always check the care label before washing",
-        "Use cold or warm water (not hot)",
-        "Use mild, eco-friendly detergents",
-        "Wash similar colors together",
-        "Avoid overloading the washing machine",
+        t('washingTip1'),
+        t('washingTip2'),
+        t('washingTip3'),
+        t('washingTip4'),
+        t('washingTip5'),
       ],
     },
     {
       icon: Sun,
-      title: "Drying",
+      title: t('drying'),
       tips: [
-        "Air dry when possible to preserve fabric quality",
-        "Avoid direct sunlight for colored fabrics",
-        "Use low heat settings if using a dryer",
-        "Remove promptly to prevent wrinkles",
-        "Hang or lay flat to maintain shape",
+        t('dryingTip1'),
+        t('dryingTip2'),
+        t('dryingTip3'),
+        t('dryingTip4'),
+        t('dryingTip5'),
       ],
     },
     {
       icon: Shirt,
-      title: "Ironing",
+      title: t('ironing'),
       tips: [
-        "Check fabric care label for temperature settings",
-        "Use steam for stubborn wrinkles",
-        "Iron on the reverse side for delicate fabrics",
-        "Never iron directly on prints or embroidery",
-        "Let fabric cool before storing",
+        t('ironingTip1'),
+        t('ironingTip2'),
+        t('ironingTip3'),
+        t('ironingTip4'),
+        t('ironingTip5'),
       ],
     },
     {
       icon: Wind,
-      title: "Storage",
+      title: t('storage'),
       tips: [
-        "Store in a cool, dry place",
-        "Use breathable storage containers",
-        "Avoid plastic bags for long-term storage",
-        "Fold properly to prevent creasing",
-        "Keep away from direct sunlight",
+        t('storageTip1'),
+        t('storageTip2'),
+        t('storageTip3'),
+        t('storageTip4'),
+        t('storageTip5'),
       ],
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto container-padding py-16">
-      <div className="text-center mb-20">
-        <h1 className="heading-medium mb-6">How to Care for Your Textiles</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Proper care ensures your textiles stay beautiful and last longer.
-          Follow these guidelines to maintain the quality of your purchases.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {careTips.map((section, index) => {
-          const Icon = section.icon;
-          return (
-            <div key={index} className="card-hover">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-4 bg-primary-100 rounded-xl shadow-soft">
-                  <Icon className="h-7 w-7 text-primary-600" />
-                </div>
-                <h2 className="text-2xl font-medium">{section.title}</h2>
-              </div>
-              <ul className="space-y-3">
-                {section.tips.map((tip, tipIndex) => (
-                  <li key={tipIndex} className="flex items-start gap-3">
-                    <span className="text-primary-600 mt-1.5 font-bold">•</span>
-                    <span className="text-gray-700 leading-relaxed">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-2 border-primary-200">
-        <h2 className="text-2xl font-medium mb-6">General Care Guidelines</h2>
-        <div className="space-y-4 text-gray-700 leading-relaxed">
-          <p className="text-lg">
-            <strong className="text-primary-700">Read the Label:</strong> Always
-            check the care label on your textiles. It contains specific
-            instructions for that particular fabric.
+    <div className="w-full">
+      {/* Hero Section */}
+      <section className="section-padding w-full relative bg-white">
+        <div className="max-w-7xl mx-auto container-padding text-center">
+          <p
+            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
+            style={{
+              color: "var(--muted-foreground)",
+              letterSpacing: isMobile ? "4px" : "6px",
+            }}
+          >
+            {t('careGuide')}
           </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Sort by Color:</strong>{" "}
-            Separate whites, lights, and darks to prevent color bleeding.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Use Gentle Cycles:</strong> For
-            delicate fabrics, use the gentle or delicate cycle on your washing
-            machine.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Avoid Harsh Chemicals:</strong>{" "}
-            Use mild detergents and avoid bleach unless specifically
-            recommended.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Regular Maintenance:</strong>{" "}
-            Regular cleaning and proper storage will extend the life of your
-            textiles significantly.
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
+            style={{ color: "var(--foreground)" }}
+          >
+            {t('howToCareForTextiles')}
+          </h1>
+          <p
+            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            {t('properCareDescription')}
           </p>
         </div>
-      </div>
+      </section>
+
+      {/* Care Tips Grid */}
+      <section className="section-padding w-full relative" style={{ backgroundColor: "var(--muted)" }}>
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
+            {careTips.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <div
+                  key={index}
+                  className="group"
+                  style={{
+                    transition: "transform 0.3s ease-out",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  <div className="flex items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div
+                      className="p-4 sm:p-6 flex-shrink-0"
+                      style={{
+                        backgroundColor: "var(--primary)",
+                        color: "white",
+                      }}
+                    >
+                      <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+                    </div>
+                    <h2
+                      className="text-2xl sm:text-3xl md:text-4xl font-medium"
+                      style={{ color: "var(--foreground)" }}
+                    >
+                      {section.title}
+                    </h2>
+                  </div>
+                  <ul className="space-y-3 sm:space-y-4">
+                    {section.tips.map((tip, tipIndex) => (
+                      <li key={tipIndex} className="flex items-start gap-3 sm:gap-4">
+                        <span
+                          className="text-lg sm:text-xl font-bold mt-0.5 flex-shrink-0"
+                          style={{ color: "var(--primary)" }}
+                        >
+                          •
+                        </span>
+                        <span
+                          className="text-base sm:text-lg leading-relaxed"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          {tip}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* General Guidelines Section */}
+      <section className="section-padding w-full relative bg-white">
+        <div className="max-w-4xl mx-auto container-padding">
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight mb-8 sm:mb-12"
+            style={{ color: "var(--foreground)" }}
+          >
+            {t('generalCareGuidelines')}
+          </h2>
+          <div className="space-y-6 sm:space-y-8">
+            <div>
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-2">
+                <strong style={{ color: "var(--primary)" }}>{t('readTheLabel')}</strong>
+                <span style={{ color: "var(--muted-foreground)" }}>
+                  {" "}
+                  {t('readTheLabelText')}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-2">
+                <strong style={{ color: "var(--primary)" }}>{t('sortByColor')}</strong>
+                <span style={{ color: "var(--muted-foreground)" }}>
+                  {" "}
+                  {t('sortByColorText')}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-2">
+                <strong style={{ color: "var(--primary)" }}>{t('useGentleCycles')}</strong>
+                <span style={{ color: "var(--muted-foreground)" }}>
+                  {" "}
+                  {t('useGentleCyclesText')}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-2">
+                <strong style={{ color: "var(--primary)" }}>{t('avoidHarshChemicals')}</strong>
+                <span style={{ color: "var(--muted-foreground)" }}>
+                  {" "}
+                  {t('avoidHarshChemicalsText')}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-2">
+                <strong style={{ color: "var(--primary)" }}>{t('regularMaintenance')}</strong>
+                <span style={{ color: "var(--muted-foreground)" }}>
+                  {" "}
+                  {t('regularMaintenanceText')}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

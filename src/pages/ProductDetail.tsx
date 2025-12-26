@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 import { getProductById, products } from "../data/products";
 import { useCart } from "../contexts/CartContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "../components/ProductCard";
 import { getAssetPath } from "../utils/images";
 import ImageWithLoader from "../components/ImageWithLoader";
 
 export default function ProductDetail() {
+  const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const product = id ? getProductById(id) : undefined;
@@ -158,12 +160,7 @@ export default function ProductDetail() {
   }
 
   const handleAddToCart = () => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-    });
+    addToCart(product);
   };
 
   // Get recommended products (exclude current product, same category, limit to 3)
@@ -414,7 +411,7 @@ export default function ProductDetail() {
                         e.currentTarget.style.transform = "scale(1)";
                         e.currentTarget.style.color = "var(--foreground)";
                       }}
-                      aria-label="View fullscreen"
+                      aria-label={t('viewFullscreen')}
                     >
                       <ZoomIn className="h-5 w-5" />
                     </button>
@@ -443,7 +440,7 @@ export default function ProductDetail() {
                         className="text-sm sm:text-base font-medium"
                         style={{ color: "var(--foreground)" }}
                       >
-                        Size:
+                        {t('size')}:
                       </span>
                       <span
                         className="text-sm sm:text-base"
@@ -469,7 +466,7 @@ export default function ProductDetail() {
                         className="text-sm sm:text-base font-medium"
                         style={{ color: "var(--foreground)" }}
                       >
-                        Fabric:
+                        {t('fabric')}:
                       </span>
                       <span
                         className="text-sm sm:text-base"
@@ -491,7 +488,7 @@ export default function ProductDetail() {
                           borderColor: "var(--destructive)",
                         }}
                       >
-                        Out of Stock
+                        {t('outOfStock')}
                       </span>
                     </div>
                   )}
@@ -505,7 +502,7 @@ export default function ProductDetail() {
                     }}
                   >
                     <ShoppingCart className="h-5 w-5" />
-                    Add to Cart
+                    {t('addToCart')}
                   </button>
                 </div>
               </div>
@@ -735,7 +732,7 @@ export default function ProductDetail() {
             className="heading-medium mb-8"
             style={{ color: "var(--foreground)" }}
           >
-            Recommended Products
+            {t('recommendedProducts')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
             {recommendedProducts.map((recommendedProduct, index) => (

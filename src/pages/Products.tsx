@@ -9,7 +9,7 @@ export default function Products() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") || "All";
+  const categoryParam = searchParams.get("category") || t("all");
   const [selectedCategory, setSelectedCategory] =
     useState<string>(categoryParam);
   const [lastPageVisited, setLastPageVisited] = useState<string>(t("home"));
@@ -17,7 +17,7 @@ export default function Products() {
     typeof window !== "undefined" && window.innerWidth <= 768
   );
   const categories = [
-    "All",
+    t("all"),
     ...Array.from(new Set(products.map((p) => p.category))),
   ];
 
@@ -63,7 +63,9 @@ export default function Products() {
           }
         >
           <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Back to {lastPageVisited}</span>
+          <span className="font-medium">
+            {t("backTo")} {lastPageVisited}
+          </span>
         </button>
       </div>
 
@@ -80,7 +82,9 @@ export default function Products() {
                 style={{ color: "var(--muted-foreground)" }}
               >
                 {filteredProducts.length}{" "}
-                {filteredProducts.length === 1 ? "ITEM" : "ITEMS"}
+                {filteredProducts.length === 1
+                  ? t("item").toUpperCase()
+                  : t("items").toUpperCase()}
               </div>
               <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
                 {categories.map((category) => (
@@ -88,7 +92,7 @@ export default function Products() {
                     key={category}
                     onClick={() => {
                       setSelectedCategory(category);
-                      if (category === "All") {
+                      if (category === t("all")) {
                         setSearchParams({});
                       } else {
                         setSearchParams({ category });
@@ -173,7 +177,7 @@ export default function Products() {
                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
               >
-                View All Products
+                {t("allProducts")}
               </button>
             </div>
           </div>

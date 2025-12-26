@@ -11,8 +11,10 @@ import { useEffect, useRef, useState } from "react";
 import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
 import ImageWithLoader from "../components/ImageWithLoader";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Home() {
+  const { t } = useLanguage();
   const [scrollY, setScrollY] = useState(0);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroContainerRef = useRef<HTMLDivElement>(null);
@@ -73,22 +75,20 @@ export default function Home() {
     {
       category: "Cotton",
       products: cottonProducts,
-      subtitle: "EVERYDAY LUXURY",
-      title: "Cotton",
-      description:
-        "Soft, breathable cotton in an array of sophisticated hues and weaves",
+      subtitle: t('everydayLuxury'),
+      title: t('cotton'),
+      description: t('cottonDescription'),
       link: "/products?category=Cotton",
-      linkText: "EXPLORE COTTON",
+      linkText: t('exploreCotton'),
     },
     {
       category: "Linen",
       products: linenProducts,
-      subtitle: "TIMELESS ELEGANCE",
-      title: "Linen",
-      description:
-        "Luxurious linen with an exquisite drape and natural texture",
+      subtitle: t('timelessElegance'),
+      title: t('linen'),
+      description: t('linenDescription'),
       link: "/products?category=Linen",
-      linkText: "EXPLORE LINEN",
+      linkText: t('exploreLinen'),
     },
   ];
 
@@ -386,7 +386,7 @@ export default function Home() {
             className="text-xs sm:text-sm md:text-base uppercase mb-3 sm:mb-4 font-medium text-white/90 px-2"
             style={{ letterSpacing: isMobile ? "4px" : "6px" }}
           >
-            TABLE LINEN MADE WITH LOVE ❤️
+            {t('tableLinenMadeWithLove')}
           </p>
           <h1
             className="mb-6 md:mb-8 leading-tight text-white"
@@ -394,12 +394,10 @@ export default function Home() {
               fontSize: isMobile ? "clamp(2.5rem, 8vw, 5.75rem)" : "92px"
             }}
           >
-            Ćao! It's NOOK
+            {t('heroTitle')}
           </h1>
           <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto px-2">
-            At NOOK we believe that a home is a place where every object
-            matters. That's why we create table linen in small batches, with
-            care for every detail.
+            {t('heroDescription')}
           </p>
           <Link
             ref={heroButtonRef}
@@ -416,7 +414,7 @@ export default function Home() {
             onMouseEnter={() => setIsHeroButtonHovered(true)}
             onMouseLeave={() => setIsHeroButtonHovered(false)}
           >
-            VIEW COLLECTION
+            {t('viewCollection')}
             <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -438,7 +436,7 @@ export default function Home() {
             }`}
             style={{ letterSpacing: isMobile ? "4px" : "6px" }}
           >
-            DELIVERY HOURS
+            {t('deliveryHours')}
           </p>
           <p
             className={`text-xs sm:text-sm leading-relaxed transition-colors duration-300 ${
@@ -447,7 +445,7 @@ export default function Home() {
                 : "text-gray-700"
             }`}
           >
-            We accept and deliver orders on weekdays, from 10 AM to 7 PM.
+            {t('deliveryHoursText')}
           </p>
         </div>
       </section>
@@ -466,20 +464,19 @@ export default function Home() {
               letterSpacing: isMobile ? "4px" : "6px",
             }}
           >
-            OUR COLLECTION
+            {t('ourCollection')}
           </p>
           <h2
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
             style={{ color: "var(--foreground)" }}
           >
-            Exceptional Textiles
+            {t('exceptionalTextiles')}
           </h2>
           <p
             className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "var(--muted-foreground)" }}
           >
-            Each fabric in our collection is chosen for its unique character,
-            quality, and the artistry behind its creation
+            {t('exceptionalTextilesDescription')}
           </p>
         </div>
       </section>
