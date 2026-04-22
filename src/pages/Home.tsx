@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Mail, MessageCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -22,6 +22,32 @@ const HERO_IMAGES = [
   "/slider/hero-slider-12.jpg",
 ];
 
+// Custom hook for scroll-triggered reveals
+function useRevealOnScroll(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsRevealed(true);
+          observer.unobserve(element);
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, isRevealed };
+}
+
 export default function Home() {
   const { t } = useLanguage();
   const [scrollY, setScrollY] = useState(0);
@@ -32,6 +58,14 @@ export default function Home() {
   const [linenSlideIndex, setLinenSlideIndex] = useState(0);
   const [isCottonHovered, setIsCottonHovered] = useState(false);
   const [isLinenHovered, setIsLinenHovered] = useState(false);
+  const [heroLoaded, setHeroLoaded] = useState(false);
+
+  // Reveal hooks for sections
+  const collectionReveal = useRevealOnScroll();
+  const cottonReveal = useRevealOnScroll();
+  const linenReveal = useRevealOnScroll();
+  const storyReveal = useRevealOnScroll();
+  const contactReveal = useRevealOnScroll();
 
   const cottonProduct = products.find((p) => p.id === "4");
   const linenProduct = products.find((p) => p.id === "1");
@@ -40,10 +74,19 @@ export default function Home() {
   const linenImages =
     linenProduct?.gallery || [linenProduct?.image || ""].filter(Boolean);
 
+  const handleScroll = useCallback(() => {
+    setScrollY(window.scrollY);
+  }, []);
+
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  useEffect(() => {
+    // Trigger hero animation after mount
+    const timer = setTimeout(() => setHeroLoaded(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -71,7 +114,7 @@ export default function Home() {
   }, [isLinenHovered, linenImages.length]);
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       {/* Hero Section */}
       <section
         ref={heroImageRef}
@@ -82,7 +125,7 @@ export default function Home() {
         <div
           className="absolute inset-0"
           style={{
-            transform: `translateY(${scrollY * 0.3}px)`,
+            transform: `translateY(${scrollY * 0.25}px) scale(${1 + scrollY * 0.0002})`,
             willChange: "transform",
           }}
         >
@@ -104,42 +147,72 @@ export default function Home() {
               />
             </div>
           ))}
-          <div className="absolute inset-0 bg-black/35 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10" />
+        </div>
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          {HERO_IMAGES.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setHeroSlideIndex(index)}
+              className={`h-1 rounded-full transition-all duration-500 ${
+                index === heroSlideIndex 
+                  ? "w-8 bg-white" 
+                  : "w-2 bg-white/40 hover:bg-white/60"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
 
         <div className="relative z-10 container-padding text-center max-w-4xl">
-          <p className="text-sm md:text-base uppercase tracking-widest mb-4 font-medium text-white/90">
+          <p 
+            className={`text-sm md:text-base uppercase tracking-[0.3em] mb-6 font-medium text-white/90 transition-all duration-700 ${
+              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             {t("home.heroEyebrow")}
           </p>
-          <h1 className="heading-large mb-8 leading-tight text-white">
+          <h1 
+            className={`heading-large mb-8 leading-tight text-white text-balance transition-all duration-700 delay-150 ${
+              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             {t("home.heroTitle")}
           </h1>
-          <p className="text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto">
+          <p 
+            className={`text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto transition-all duration-700 delay-300 ${
+              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             {t("home.heroLead")}
           </p>
-          <Link
-            to="/products"
-            className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit bg-white text-gray-900 hover:bg-white/90"
+          <div
+            className={`transition-all duration-700 delay-500 ${
+              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
           >
-            {t("home.heroCta")}
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+            <Link
+              to="/products"
+              className="font-semibold py-4 px-10 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center group w-fit bg-white text-foreground"
+            >
+              {t("home.heroCta")}
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
 
         <div
-          className="hidden md:block absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs z-10"
-          style={{ backgroundColor: "rgba(255,255,255,0.92)" }}
+          className={`hidden lg:block absolute bottom-12 right-12 backdrop-blur-md p-6 shadow-large max-w-xs z-10 transition-all duration-700 delay-700 border border-white/10 ${
+            heroLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+          }`}
+          style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
         >
-          <p
-            className="text-sm font-semibold mb-2 uppercase tracking-widest"
-            style={{ color: "var(--foreground)" }}
-          >
+          <p className="text-sm font-semibold mb-2 uppercase tracking-widest text-foreground">
             {t("home.heroOverlayTitle")}
           </p>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: "var(--muted-foreground)" }}
-          >
+          <p className="text-sm leading-relaxed text-muted-foreground">
             {t("home.heroOverlayText")}
           </p>
         </div>
@@ -147,25 +220,28 @@ export default function Home() {
 
       {/* Collection Introduction */}
       <section
-        className="section-padding w-full"
-        style={{ backgroundColor: "#ffffff" }}
+        ref={collectionReveal.ref}
+        className="section-padding w-full bg-white"
       >
         <div className="max-w-7xl mx-auto container-padding text-center">
           <p
-            className="text-sm md:text-base uppercase tracking-widest mb-6 font-medium"
-            style={{ color: "var(--muted-foreground)" }}
+            className={`text-sm md:text-base uppercase tracking-[0.25em] mb-6 font-medium text-muted-foreground transition-all duration-700 ${
+              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
           >
             {t("home.collectionEyebrow")}
           </p>
           <h2
-            className="heading-large mb-8"
-            style={{ color: "var(--foreground)" }}
+            className={`heading-large mb-8 text-foreground text-balance transition-all duration-700 delay-100 ${
+              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
           >
             {t("home.collectionTitle")}
           </h2>
           <p
-            className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto"
-            style={{ color: "var(--muted-foreground)" }}
+            className={`text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-muted-foreground transition-all duration-700 delay-200 ${
+              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
           >
             {t("home.collectionLead")}
           </p>
@@ -173,9 +249,14 @@ export default function Home() {
       </section>
 
       {/* Cotton */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative">
+      <section 
+        ref={cottonReveal.ref}
+        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
+      >
         <div
-          className="relative overflow-hidden"
+          className={`relative overflow-hidden transition-all duration-1000 ${
+            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
+          }`}
           onMouseEnter={() => setIsCottonHovered(true)}
           onMouseLeave={() => setIsCottonHovered(false)}
         >
@@ -183,9 +264,10 @@ export default function Home() {
             {cottonImages.map((image, index) => (
               <div
                 key={index}
-                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                className="absolute inset-0 transition-all duration-1000 ease-in-out"
                 style={{
                   opacity: index === cottonSlideIndex ? 1 : 0,
+                  transform: index === cottonSlideIndex ? "scale(1)" : "scale(1.05)",
                   zIndex: index === cottonSlideIndex ? 1 : 0,
                 }}
               >
@@ -196,43 +278,49 @@ export default function Home() {
                 />
               </div>
             ))}
+            {/* Image slide indicators */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {cottonImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCottonSlideIndex(index)}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    index === cottonSlideIndex 
+                      ? "w-6 bg-white" 
+                      : "w-2 bg-white/50 hover:bg-white/70"
+                  }`}
+                  aria-label={`View image ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         <div
-          className="flex flex-col justify-center relative"
-          style={{ backgroundColor: "var(--card)" }}
+          className={`flex flex-col justify-center relative bg-card transition-all duration-1000 delay-200 ${
+            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+          }`}
         >
           <div className="container-padding py-16 lg:py-24">
             <div className="max-w-lg text-center lg:text-left">
-              <p
-                className="text-xs md:text-sm uppercase tracking-widest mb-4 font-medium"
-                style={{ color: "var(--muted-foreground)" }}
-              >
+              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
                 {t("home.cottonEyebrow")}
               </p>
-              <h2
-                className="heading-large mb-6 leading-tight"
-                style={{ color: "var(--foreground)" }}
-              >
+              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
                 {t("home.cottonTitle")}
               </h2>
-              <p
-                className="text-base md:text-lg mb-10 leading-relaxed"
-                style={{ color: "var(--muted-foreground)" }}
-              >
+              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
                 {t("home.cottonText")}
               </p>
               <Link
                 to="/products?category=Cotton"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group border-b-2 pb-1"
-                style={{
-                  color: "var(--foreground)",
-                  borderColor: "var(--primary)",
-                }}
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
               >
-                {t("home.cottonCta")}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <span className="relative">
+                  {t("home.cottonCta")}
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
+                </span>
+                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
               </Link>
             </div>
           </div>
@@ -240,48 +328,44 @@ export default function Home() {
       </section>
 
       {/* Linen */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative">
+      <section 
+        ref={linenReveal.ref}
+        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
+      >
         <div
-          className="flex flex-col justify-center order-2 lg:order-1 relative"
-          style={{ backgroundColor: "var(--card)" }}
+          className={`flex flex-col justify-center order-2 lg:order-1 relative bg-card transition-all duration-1000 delay-200 ${
+            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
+          }`}
         >
           <div className="container-padding py-16 lg:py-24 relative z-10">
-            <div className="max-w-lg text-center lg:text-left">
-              <p
-                className="text-xs md:text-sm uppercase tracking-widest mb-4 font-medium"
-                style={{ color: "var(--muted-foreground)" }}
-              >
+            <div className="max-w-lg text-center lg:text-left lg:ml-auto">
+              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
                 {t("home.linenEyebrow")}
               </p>
-              <h2
-                className="heading-large mb-6 leading-tight"
-                style={{ color: "var(--foreground)" }}
-              >
+              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
                 {t("home.linenTitle")}
               </h2>
-              <p
-                className="text-base md:text-lg mb-10 leading-relaxed"
-                style={{ color: "var(--muted-foreground)" }}
-              >
+              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
                 {t("home.linenText")}
               </p>
               <Link
                 to="/products?category=Linen"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group border-b-2 pb-1"
-                style={{
-                  color: "var(--foreground)",
-                  borderColor: "var(--primary)",
-                }}
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
               >
-                {t("home.linenCta")}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <span className="relative">
+                  {t("home.linenCta")}
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
+                </span>
+                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
               </Link>
             </div>
           </div>
         </div>
 
         <div
-          className="relative overflow-hidden order-1 lg:order-2"
+          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 ${
+            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+          }`}
           onMouseEnter={() => setIsLinenHovered(true)}
           onMouseLeave={() => setIsLinenHovered(false)}
         >
@@ -289,9 +373,10 @@ export default function Home() {
             {linenImages.map((image, index) => (
               <div
                 key={index}
-                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                className="absolute inset-0 transition-all duration-1000 ease-in-out"
                 style={{
                   opacity: index === linenSlideIndex ? 1 : 0,
+                  transform: index === linenSlideIndex ? "scale(1)" : "scale(1.05)",
                   zIndex: index === linenSlideIndex ? 1 : 0,
                 }}
               >
@@ -302,12 +387,30 @@ export default function Home() {
                 />
               </div>
             ))}
+            {/* Image slide indicators */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {linenImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setLinenSlideIndex(index)}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    index === linenSlideIndex 
+                      ? "w-6 bg-white" 
+                      : "w-2 bg-white/50 hover:bg-white/70"
+                  }`}
+                  aria-label={`View image ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Our Story */}
-      <section className="relative min-h-[90vh] overflow-hidden">
+      <section 
+        ref={storyReveal.ref}
+        className="relative min-h-[90vh] overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
           <div
             className="absolute inset-0 opacity-20"
@@ -315,21 +418,30 @@ export default function Home() {
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='fabric' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Crect width='40' height='40' fill='%23ffffff'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23000000' stroke-width='0.5' opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23fabric)'/%3E%3C/svg%3E")`,
               backgroundSize: "80px 80px",
             }}
-          ></div>
+          />
         </div>
 
         <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-24 lg:py-32">
           <div className="max-w-3xl mx-auto text-center">
-            <p className="text-sm md:text-base text-white/80 uppercase tracking-widest mb-6 font-medium">
+            <p 
+              className={`text-sm md:text-base text-white/80 uppercase tracking-[0.25em] mb-6 font-medium transition-all duration-700 ${
+                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              }`}
+            >
               {t("home.storyEyebrow")}
             </p>
             <h2
-              className="heading-large mb-8 leading-tight whitespace-pre-line"
-              style={{ color: "white" }}
+              className={`heading-large mb-8 leading-tight whitespace-pre-line text-white text-balance transition-all duration-700 delay-100 ${
+                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              }`}
             >
               {t("home.storyTitle")}
             </h2>
-            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
+            <p 
+              className={`text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-200 ${
+                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              }`}
+            >
               {t("home.storyText")}
             </p>
           </div>
@@ -337,7 +449,10 @@ export default function Home() {
       </section>
 
       {/* Contact */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh]">
+      <section 
+        ref={contactReveal.ref}
+        className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh]"
+      >
         <div className="relative bg-gray-900 overflow-hidden">
           <div
             className="absolute inset-0 opacity-30"
@@ -360,90 +475,71 @@ export default function Home() {
             `,
               filter: "blur(2px)",
             }}
-          ></div>
+          />
         </div>
 
-        <div
-          className="flex flex-col justify-center"
-          style={{ backgroundColor: "var(--card)" }}
-        >
+        <div className="flex flex-col justify-center bg-card">
           <div className="container-padding py-16 lg:py-24">
-            <div className="max-w-lg">
-              <p className="text-sm md:text-base text-gray-500 uppercase tracking-widest mb-4 font-medium">
+            <div 
+              className={`max-w-lg transition-all duration-700 ${
+                contactReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
+              <p className="text-sm md:text-base text-muted-foreground uppercase tracking-[0.25em] mb-4 font-medium">
                 {t("home.visitEyebrow")}
               </p>
-              <h2
-                className="heading-large mb-6 leading-tight"
-                style={{ color: "var(--foreground)" }}
-              >
+              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
                 {t("home.visitTitle")}
               </h2>
-              <p className="text-base md:text-lg text-gray-600 mb-12 leading-relaxed">
+              <p className="text-base md:text-lg text-muted-foreground mb-12 leading-relaxed">
                 {t("home.visitText")}
               </p>
 
               <div className="space-y-8">
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
-                    style={{ backgroundColor: "var(--primary)" }}
+                {[
+                  {
+                    icon: Mail,
+                    title: t("home.emailTitle"),
+                    content: (
+                      <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                      >
+                        {CONTACT_EMAIL}
+                      </a>
+                    ),
+                    delay: "delay-100",
+                  },
+                  {
+                    icon: MapPin,
+                    title: t("home.locationTitle"),
+                    content: <p className="text-muted-foreground leading-relaxed">{t("home.locationText")}</p>,
+                    delay: "delay-200",
+                  },
+                  {
+                    icon: MessageCircle,
+                    title: t("home.pickupTitle"),
+                    content: <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{t("home.pickupText")}</p>,
+                    delay: "delay-300",
+                  },
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className={`flex items-start gap-4 transition-all duration-700 ${item.delay} ${
+                      contactReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                    }`}
                   >
-                    <Mail className="h-6 w-6 text-white" />
+                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-primary shadow-md transition-transform duration-300 hover:scale-105">
+                      <item.icon className="h-5 w-5 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {item.title}
+                      </h3>
+                      {item.content}
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t("home.emailTitle")}
-                    </h3>
-                    <a
-                      href={`mailto:${CONTACT_EMAIL}`}
-                      className="transition-colors"
-                      style={{ color: "var(--muted-foreground)" }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--primary)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color =
-                          "var(--muted-foreground)")
-                      }
-                    >
-                      {CONTACT_EMAIL}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
-                    style={{ backgroundColor: "var(--primary)" }}
-                  >
-                    <MapPin className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t("home.locationTitle")}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {t("home.locationText")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
-                    style={{ backgroundColor: "var(--primary)" }}
-                  >
-                    <MessageCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t("home.pickupTitle")}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                      {t("home.pickupText")}
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

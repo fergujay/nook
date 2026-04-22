@@ -34,6 +34,10 @@
   --font-weight-normal: 400;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply antialiased;
@@ -54,24 +58,29 @@
   h6 {
     @apply font-medium tracking-tight;
   }
+
+  /* Focus visible styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
 }
 
 @layer components {
   .btn-primary {
     background-color: var(--primary);
     color: var(--primary-foreground);
-    @apply font-medium py-3 px-8 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0;
+    @apply font-medium py-3 px-8 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98];
   }
 
   .btn-secondary {
     background-color: var(--card);
     color: var(--card-foreground);
-    @apply font-medium py-3 px-8 border-2 transition-all duration-300 shadow-sm hover:shadow-md;
+    @apply font-medium py-3 px-8 border-2 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5;
     border-color: var(--border);
   }
 
   .btn-outline {
-    @apply bg-transparent font-medium py-3 px-8 border-2 transition-all duration-300;
+    @apply bg-transparent font-medium py-3 px-8 border-2 transition-all duration-300 hover:bg-primary hover:text-primary-foreground;
     color: var(--primary);
     border-color: var(--primary);
   }
@@ -107,8 +116,77 @@
   .heading-medium {
     @apply text-3xl md:text-4xl font-medium tracking-tight;
   }
+
+  /* Enhanced link underline animation */
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Image hover zoom effect */
+  .img-zoom {
+    @apply overflow-hidden;
+  }
+
+  .img-zoom img {
+    @apply transition-transform duration-500 ease-out;
+  }
+
+  .img-zoom:hover img {
+    @apply scale-105;
+  }
+
+  /* Glass effect for overlays */
+  .glass {
+    @apply bg-card/80 backdrop-blur-md;
+  }
+
+  /* Stagger animation delay utilities */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
 }
 
+@layer utilities {
+  /* Reveal animation base state */
+  .reveal {
+    @apply opacity-0 translate-y-8 transition-all duration-700 ease-out;
+  }
+
+  .reveal.revealed {
+    @apply opacity-100 translate-y-0;
+  }
+
+  /* Slide in from directions */
+  .slide-in-left {
+    @apply opacity-0 -translate-x-8 transition-all duration-700 ease-out;
+  }
+
+  .slide-in-left.revealed {
+    @apply opacity-100 translate-x-0;
+  }
+
+  .slide-in-right {
+    @apply opacity-0 translate-x-8 transition-all duration-700 ease-out;
+  }
+
+  .slide-in-right.revealed {
+    @apply opacity-100 translate-x-0;
+  }
+}
+
+/* Keyframe animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -116,4 +194,88 @@
   to {
     opacity: 1;
   }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-muted animate-pulse rounded;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
 }
