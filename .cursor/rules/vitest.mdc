@@ -1,0 +1,71 @@
+---
+description: Vitest + Testing Library conventions (unit & component tests)
+globs: src/**/*.{test,spec}.{ts,tsx}
+alwaysApply: false
+---
+
+# Vitest + Testing Library
+
+This project uses **Vitest** (not Jest). Globals are enabled (`describe`, `it`, `expect`, `vi`) via `vitest.config.ts`. `@testing-library/jest-dom` matchers are loaded in `src/test/setup.ts`.
+
+## File layout
+
+- Colocate: `foo.ts` → `foo.test.ts`, `Foo.tsx` → `Foo.test.tsx`.
+- One top-level `describe` per file, named after the subject under test.
+
+## Component test template
+
+```tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it } from 'vitest'
+import { CartProvider } from '../contexts/CartContext'
+import { LanguageProvider } from '../contexts/LanguageContext'
+import ProductCard from './ProductCard'
+
+function renderWithProviders(ui: React.ReactNode, { route = '/' } = {}) {
+  return render(
+    <LanguageProvider>
+      <CartProvider>
+        <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+      </CartProvider>
+    </LanguageProvider>
+  )
+}
+
+describe('ProductCard', () => {
+  it('links to the product detail page', async () => {
+    renderWithProviders(<ProductCard product={fixture} />)
+    const link = screen.getByRole('link', { name: /reindeer moss/i })
+    expect(link).toHaveAttribute('href', '/products/1')
+  })
+
+  it('adds the product to the cart when the button is clicked', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<ProductCard product={fixture} />)
+    await user.click(screen.getByRole('button', { name: /add to cart/i }))
+    expect(await screen.findByText(/1 item/i)).toBeInTheDocument()
+  })
+})
+```
+
+## Rules
+
+- **Query priority**: `getByRole` → `getByLabelText` → `getByText` → `getByTestId`. Add `data-testid` only when nothing else works.
+- **User interactions**: always `userEvent.setup()` then `await user.click(…)`. Don't use `fireEvent` unless testing a specific event type.
+- **Async**: `await screen.findBy…` or `await waitFor(…)`. Never bare `setTimeout`.
+- **Mocks**: `vi.mock(…)` at the top, `vi.fn()` for stubs, `vi.resetModules()` in `beforeEach` when testing modules that read JSON or env at import time (see `src/utils/images.test.ts`).
+- **Providers**: always wrap in `LanguageProvider` + `CartProvider` + a router. Build a `renderWithProviders` helper per test file or in `src/test/utils.tsx`.
+- **Fixtures**: put shared product fixtures in `src/test/fixtures.ts`, not inline per test.
+
+## Forbidden
+
+- `@ts-expect-error` to silence test‑only type errors — fix the types.
+- Disabling rules with `eslint-disable` inline. Fix the underlying issue or update the rule.
+- Snapshot tests (`toMatchSnapshot`). Prefer explicit assertions.
+- `jest.*` — this project does not have Jest. Use `vi.*`.
+
+## If unsure
+
+If you're unsure which Vitest API to use or whether a testing-library pattern is current, fetch canonical docs through Context7 (see `context7.mdc`) — search `vitest` and `@testing-library/react`.

@@ -1,0 +1,43 @@
+---
+description: When and how to use Context7 for library docs
+alwaysApply: true
+---
+
+# Use Context7 for library docs
+
+When working in this repo, if you're about to write code that depends on a third‑party library and you are not 100% sure of the current API, **consult Context7 before writing** instead of relying on training data.
+
+## Triggers (consult Context7)
+
+- About to call a method, hook, or option from any of the following and not 100% sure of the current signature:
+  - `react`, `react-dom`, `react-router-dom`
+  - `vitest`, `@vitest/ui`, `@vitest/coverage-v8`
+  - `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`
+  - `@playwright/test`
+  - `vite`, `@vitejs/plugin-react`, `vite-imagetools`
+  - `tailwindcss`, `postcss`, `autoprefixer`
+  - `lucide-react`, `react-icons`, `yet-another-react-lightbox`
+  - `@vercel/blob`, `vercel.json` schema, Vercel platform features
+- User asks "how do I do X with <library>" and the answer is version‑sensitive.
+- Build, lint, or test fails with a cryptic error from a specific library.
+
+## How to consult
+
+1. Prefer the Context7 MCP if available in this environment (`resolve-library-id`, then `get-library-docs` for the resolved ID). If not available, fall back to the library's official docs via `WebFetch` on `https://…`.
+2. Query with specific symbols, not generic phrases. Good: `vitest vi.mock factory signature`. Bad: `vitest mocking`.
+3. Pin to the version pulled from `package.json` when the MCP supports version filtering.
+4. Cite the exact function or option you used in the commit message or PR description when the answer was non‑obvious.
+
+## Do not
+
+- Do not invent APIs to make an example compile.
+- Do not use Stack Overflow answers older than 12 months for React Router v6, Vitest 4, or Playwright — they're often wrong for current APIs.
+- Do not add a new library without checking Context7 for current install instructions and peer‑dependency constraints.
+
+## Workflow example
+
+> I need to mock a JSON import in Vitest so `getAssetPath` reads a different `mediaManifest.json`.
+
+1. Check Context7 for `vitest` → search `vi.doMock dynamic import`.
+2. Read the example; note that `vi.doMock` pairs with `vi.resetModules()` and a dynamic `await import(...)`.
+3. Implement following the documented pattern (see `src/utils/images.test.ts` for the in‑repo reference).

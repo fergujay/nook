@@ -1,0 +1,50 @@
+---
+description: Core project conventions and stack for the Nook site
+alwaysApply: true
+---
+
+# Project: Nook (textile e‑commerce SPA)
+
+Stack:
+
+- **Vite + React 18 + TypeScript** (strict mode)
+- **Tailwind CSS** with CSS custom properties (see `src/index.css` — `var(--foreground)`, `var(--primary)`, etc.)
+- **React Router v6** (SPA — deep links are rewritten to `/index.html` by `vercel.json`)
+- **Yarn v1** with a frozen lockfile (`yarn install --frozen-lockfile`)
+- **Vercel** (framework: vite, output: `dist`)
+- **Vercel Blob** for media, mapped through `src/utils/mediaManifest.json`
+
+## Non‑negotiables
+
+- Use `getAssetPath('/products/…')` from `src/utils/images.ts` for any reference to files under `public/products`, `public/slider`, or `public/videos`. Never hard‑code `/products/…` in JSX or data. This is what lets media be served from Blob in production and fall back to local in dev.
+- Keep `src/data/products.ts` a pure data module. If you add new products, add images to `public/products/<id>-<slug>/` then run `yarn upload:media` and commit the updated `src/utils/mediaManifest.json`.
+- Reuse existing contexts — `CartContext`, `LanguageContext`. Route updates go through `src/App.tsx`.
+- Keep TypeScript strict. Prefer discriminated unions and `interface` for public types over `any`.
+- Prefer colocated tests (`Component.test.tsx` next to `Component.tsx`) for unit/integration. Put E2E specs in `/e2e`.
+
+## Scripts
+
+```bash
+yarn dev              # vite dev
+yarn build            # tsc + vite build
+yarn typecheck        # tsc --noEmit (must pass)
+yarn lint             # eslint (must pass, --max-warnings 0)
+yarn test             # vitest run
+yarn test:watch       # vitest in watch mode
+yarn e2e              # playwright (spins up `yarn preview` automatically)
+yarn verify           # typecheck + lint + test + build (pre‑PR gate)
+yarn upload:media     # push public media to Vercel Blob
+```
+
+## UI conventions
+
+- Tailwind utility classes first; use `var(--…)` custom properties for themeable colors.
+- Icons from `lucide-react` (prefer) or `react-icons` (existing usage).
+- Page components live in `src/pages/`, reusable UI in `src/components/`, shared state in `src/contexts/`.
+- Prefer semantic HTML and accessible labels (`aria-label`, `role`) — required by the E2E tests.
+
+## Do not
+
+- Do not introduce a Node server or API route; this repo is a static SPA.
+- Do not commit `.env.local` or any file containing `BLOB_READ_WRITE_TOKEN`.
+- Do not bypass `yarn check` when preparing a PR.

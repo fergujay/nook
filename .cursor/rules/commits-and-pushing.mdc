@@ -1,0 +1,58 @@
+---
+description: Rules for committing and pushing changes in this repo
+alwaysApply: true
+---
+
+# Commits & pushing
+
+## Never commit unless explicitly asked
+
+- Do not create a commit unless the user explicitly says "commit", "make a commit", or similar.
+- Do not push unless the user explicitly says "push".
+- Never run `git commit --amend` or force operations without explicit request. Never use `push --force` on `main`.
+
+## Before committing
+
+Always, in this order:
+
+```bash
+yarn typecheck
+yarn lint
+yarn test
+yarn build        # must succeed (TypeScript + vite build together)
+```
+
+`yarn verify` runs all four in sequence. If any step fails, stop and surface the failure to the user — do not "fix" by adding `// @ts-expect-error`, disabling ESLint rules inline, or skipping tests.
+
+## Commit message format (Conventional Commits)
+
+`<type>(<optional-scope>): <short summary in imperative mood>`
+
+Allowed types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`, `build`, `ci`, `style`.
+
+Examples:
+
+```
+feat(products): add carrara marble napkin variants
+fix(cart): correct total when quantity changes during checkout
+chore(deps): bump @vercel/blob to 2.3.3
+test(home): cover parallax hero image with e2e smoke test
+```
+
+- No emojis in commit messages.
+- Subject line under 72 chars, no trailing period.
+- If the change is non‑trivial, add a blank line and a body that explains *why*.
+
+## Files never to stage
+
+- `.env`, `.env.local`, `.env.*.local`
+- Anything containing `BLOB_READ_WRITE_TOKEN` or other secrets
+- `dist/`, `coverage/`, `playwright-report/`, `test-results/`, `.vercel/`
+
+If `git status` shows any of these as staged, abort and ask.
+
+## Pushing
+
+- Default remote is the branch's tracked upstream. If the branch has no upstream, use `git push -u origin HEAD`.
+- Never push directly to `main` — open a PR. If the user asks to push to `main`, confirm first.
+- After pushing a PR, a Vercel preview deployment is created automatically; include the preview URL in the PR description when relevant.

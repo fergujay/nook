@@ -1,3 +1,5 @@
+import { getAssetPath } from '../utils/images'
+
 export interface Product {
   id: string
   name: string
@@ -14,7 +16,7 @@ export interface Product {
   inStock: boolean
 }
 
-export const products: Product[] = [
+const rawProducts: Product[] = [
   {
     id: '1',
     name: 'Reindeer moss',
@@ -86,6 +88,12 @@ export const products: Product[] = [
     inStock: true,
   },
 ]
+
+export const products: Product[] = rawProducts.map((p) => ({
+  ...p,
+  image: getAssetPath(p.image),
+  gallery: p.gallery?.map(getAssetPath),
+}))
 
 export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id)

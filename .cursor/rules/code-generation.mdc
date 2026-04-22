@@ -1,0 +1,57 @@
+---
+description: Code generation standards for TypeScript/React in this repo
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Code generation standards
+
+## TypeScript
+
+- Strict mode is on. Never use `any`; use `unknown` + narrowing, or define an explicit type.
+- Prefer `interface` for public/exported shapes, `type` for unions and utility types.
+- Exhaustive `switch` on discriminated unions — let unused branches fail the build, don't add `default:` just to silence the check.
+- Name types in `PascalCase`, values in `camelCase`, enum‑like constants in `SCREAMING_SNAKE_CASE`.
+
+## React
+
+- Functional components only. No class components.
+- One component per file, default export matches the file name. Helpers used only by that component live in the same file.
+- Props typed as `interface ComponentNameProps`. Do not use `React.FC`.
+- Keep components under ~200 lines. If a page grows, extract subcomponents into `src/components/`.
+- Derive state from props; lift state up only when two siblings need it.
+- Use existing providers (`CartProvider`, `LanguageProvider`) — do not add parallel global state.
+
+## Imports
+
+- Order: node builtins → third‑party → absolute `src/…` → relative. ESLint/Prettier handle spacing.
+- No circular imports. If you need to break one, prefer moving shared types to `src/types/`.
+- Use named exports for utilities and contexts; default exports for components and pages only.
+
+## Assets
+
+- Any path under `/products`, `/slider`, `/videos` must go through `getAssetPath()` from `src/utils/images.ts`. Never hard‑code these paths in JSX or data.
+- Images need `alt` text. Decorative images use `alt=""` plus `aria-hidden="true"`.
+- Videos need `aria-label` and should default to muted + playsInline.
+
+## Accessibility
+
+- Every interactive element needs an accessible name (`aria-label` for icon‑only buttons).
+- Keyboard navigation must work for all interactive elements — don't attach click handlers to `<div>`.
+- Prefer semantic elements (`<button>`, `<nav>`, `<main>`, `<header>`) over styled `<div>`s.
+
+## Comments
+
+- Write code that doesn't need a comment first. Only comment to explain *why* something non‑obvious was done (perf constraint, browser bug, business rule).
+- No narrative comments ("// fetch the user"). No emoji comments.
+
+## Forbidden
+
+- `@ts-ignore`, `@ts-expect-error` without a linked issue and a timeline to remove.
+- `eslint-disable` without a single‑line explanation.
+- `console.log` in committed code. Use a proper error surface or delete the debug log.
+- New runtime dependencies without checking bundle size impact; this is a small SPA.
+
+## If unsure about a library API
+
+Use Context7 — see `context7.mdc`.

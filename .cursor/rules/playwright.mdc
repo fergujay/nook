@@ -1,0 +1,56 @@
+---
+description: Playwright conventions for end-to-end tests
+globs: e2e/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Playwright E2E
+
+- Config: `playwright.config.ts`. It automatically runs `yarn preview` on port 4173 unless `E2E_BASE_URL` is set (so you can point tests at a Vercel preview deployment).
+- Projects: `chromium`, `webkit`, `mobile-chrome`. Write tests to work on all three unless a test is explicitly gated.
+- Test dir: `./e2e`. Do not put E2E specs under `src/` — they will be excluded from Vitest and included here.
+
+## Writing tests
+
+```ts
+import { expect, test } from '@playwright/test'
+
+test.describe('cart', () => {
+  test('adding a product updates the cart badge', async ({ page }) => {
+    await page.goto('/products/1')
+    await page.getByRole('button', { name: /add to cart/i }).click()
+    await expect(page.getByRole('link', { name: /cart/i })).toContainText('1')
+  })
+})
+```
+
+## Rules
+
+- **Selectors**: always use `page.getByRole`, `getByLabel`, or `getByText`. Do not use CSS classes or nth-child selectors — they are fragile against Tailwind refactors.
+- **Assertions**: always use Playwright's web‑first `expect(locator).toBeVisible()` / `toHaveText()` / `toHaveURL()` so it auto-waits. Never `await page.waitForTimeout(…)`.
+- **Navigation**: use `page.goto(baseURL + path)` with paths only (`/products/1`); `baseURL` is set by the config.
+- **Parallelism**: tests must be independent. Never share state across tests. Use fixtures (`test.extend`) for reusable setup.
+- **Network**: do not mock product data; these are E2E tests. If you need to intercept external calls (analytics, etc.), use `page.route`.
+- **Media**: Blob URLs are live. Use `expect(image).toHaveJSProperty('naturalWidth', expect.anything())` or `expect(response.status()).toBe(200)` when asserting that images loaded.
+- **Mobile vs desktop**: prefer `test.describe.configure({ mode: 'parallel' })` and rely on the three configured device profiles rather than hand-resizing the viewport.
+
+## Running
+
+```bash
+yarn e2e                    # all projects
+yarn e2e --project=chromium # single browser while debugging
+yarn e2e:ui                 # time-travel UI
+yarn e2e:install            # install browsers (run once after checkout / version bumps)
+
+E2E_BASE_URL=https://nook-site-abc.vercel.app yarn e2e  # run against a deployed preview
+```
+
+## Don't
+
+- Don't test content that belongs in a unit test (regex/helper logic) — put that in Vitest.
+- Don't assert on implementation details (CSS class names, component counts).
+- Don't commit `playwright-report/`, `test-results/`, or downloaded browser caches.
+
+## If unsure
+
+Fetch current Playwright docs through Context7 (`playwright` or `@playwright/test`) rather than guessing API shapes — the project moves fast, and examples above may drift.

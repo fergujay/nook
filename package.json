@@ -3,14 +3,28 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:install": "playwright install --with-deps",
     "preview": "vite preview",
-    "optimize:video": "./scripts/optimize-video.sh",
-    "optimize:assets": "./scripts/optimize-assets.sh",
-    "generate:favicon": "node scripts/generate-favicon.mjs"
+    "verify": "yarn typecheck && yarn lint && yarn test && yarn build",
+    "upload:media": "node scripts/upload-media.mjs",
+    "upload:media:dry": "DRY_RUN=1 node scripts/upload-media.mjs"
   },
   "dependencies": {
     "lineicons": "^1.3.2",
@@ -22,20 +36,32 @@
     "yet-another-react-lightbox": "^3.27.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
+    "@vercel/blob": "^2.3.3",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "@vitest/ui": "^4.1.5",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.55.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^29.0.2",
     "postcss": "^8.4.32",
-    "sharp": "^0.34.5",
+    "prettier": "^3.8.3",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
-    "vite-imagetools": "^9.0.2"
+    "vite-imagetools": "^9.0.2",
+    "vitest": "^4.1.5"
   }
 }

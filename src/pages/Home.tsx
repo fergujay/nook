@@ -1,863 +1,524 @@
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  ArrowLeft,
-  MapPin,
-  Clock,
-  Phone,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, MapPin, Clock, Phone, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
-import ImageWithLoader from "../components/ImageWithLoader";
-import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Home() {
-  const { t } = useLanguage();
   const [scrollY, setScrollY] = useState(0);
   const heroImageRef = useRef<HTMLDivElement>(null);
-  const heroContainerRef = useRef<HTMLDivElement>(null);
-  const heroButtonRef = useRef<HTMLAnchorElement>(null);
-  const deliveryOverlayRef = useRef<HTMLDivElement>(null);
-  const textilesSectionRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [isHeroButtonHovered, setIsHeroButtonHovered] = useState(false);
-  const [isDeliveryOverlayTransparent, setIsDeliveryOverlayTransparent] =
-    useState(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
-    null
-  );
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [textileSlideIndex, setTextileSlideIndex] = useState(0);
-  const [isTextileHovered, setIsTextileHovered] = useState(false);
-  const [textileDragStart, setTextileDragStart] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [textileDragOffset, setTextileDragOffset] = useState(0);
-  const [isTextileDragging, setIsTextileDragging] = useState(false);
-  const textileContainerRef = useRef<HTMLDivElement>(null);
-  const [textileContainerWidth, setTextileContainerWidth] = useState(0);
-  const [cottonProductIndex, setCottonProductIndex] = useState(0);
-  const [linenProductIndex, setLinenProductIndex] = useState(0);
-  const [isCottonImageHovered, setIsCottonImageHovered] = useState(false);
-  const [isLinenImageHovered, setIsLinenImageHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" && window.innerWidth <= 768
-  );
+  const [cottonSlideIndex, setCottonSlideIndex] = useState(0);
+  const [linenSlideIndex, setLinenSlideIndex] = useState(0);
+  const [isCottonHovered, setIsCottonHovered] = useState(false);
+  const [isLinenHovered, setIsLinenHovered] = useState(false);
 
-  // Hero slider images
-  const heroImages = [
-    "slider/hero-slider-01.jpg",
-    "slider/hero-slider-02.jpg",
-    "slider/hero-slider-03.jpg",
-    "slider/hero-slider-04.jpg",
-    "slider/hero-slider-05.jpg",
-    "slider/hero-slider-06.jpg",
-    "slider/hero-slider-07.jpg",
-    "slider/hero-slider-08.jpg",
-    "slider/hero-slider-09.jpg",
-    "slider/hero-slider-10.jpg",
-    "slider/hero-slider-11.jpg",
-    "slider/hero-slider-12.jpg",
-  ];
-
-  // Get all products for Cotton and Linen categories
-  const cottonProducts = products.filter((p) => p.category === "Cotton");
-  const linenProducts = products.filter((p) => p.category === "Linen");
-
-  // Create 2 slides: Cotton and Linen
-  const textileSlides = [
-    {
-      category: "Cotton",
-      products: cottonProducts,
-      subtitle: t('everydayLuxury'),
-      title: t('cotton'),
-      description: t('cottonDescription'),
-      link: "/products?category=Cotton",
-      linkText: t('exploreCotton'),
-    },
-    {
-      category: "Linen",
-      products: linenProducts,
-      subtitle: t('timelessElegance'),
-      title: t('linen'),
-      description: t('linenDescription'),
-      link: "/products?category=Linen",
-      linkText: t('exploreLinen'),
-    },
-  ];
+  // Get product galleries
+  const cottonProduct = products.find((p) => p.id === "4");
+  const linenProduct = products.find((p) => p.id === "1");
+  const cottonImages = cottonProduct?.gallery || [cottonProduct?.image || ""].filter(Boolean);
+  const linenImages = linenProduct?.gallery || [linenProduct?.image || ""].filter(Boolean);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
-
-      // Check if scrolled past hero button
-      if (heroButtonRef.current) {
-        const buttonRect = heroButtonRef.current.getBoundingClientRect();
-        const buttonBottom = buttonRect.bottom + window.scrollY;
-        setIsDeliveryOverlayTransparent(window.scrollY > buttonBottom);
-      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Check initial state
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle responsive video loading
+  // Cotton slideshow
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Update container width on resize
-  useEffect(() => {
-    const updateWidth = () => {
-      if (heroContainerRef.current) {
-        setContainerWidth(heroContainerRef.current.offsetWidth);
-      }
-      if (textileContainerRef.current) {
-        setTextileContainerWidth(textileContainerRef.current.offsetWidth);
-      }
-    };
-
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []);
-
-  // Hero slideshow
-  useEffect(() => {
-    if (isHeroHovered || heroImages.length <= 1 || isDragging) return;
+    if (isCottonHovered || cottonImages.length <= 1) return;
 
     const interval = setInterval(() => {
-      setHeroSlideIndex((prev) => (prev + 1) % heroImages.length);
+      setCottonSlideIndex((prev) => (prev + 1) % cottonImages.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isHeroHovered, heroImages.length, isDragging]);
+  }, [isCottonHovered, cottonImages.length]);
 
-  // Drag handlers for hero carousel
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    setDragStart({ x: clientX, y: clientY });
-    setDragOffset(0);
-    setIsDragging(true);
-
-    // Prevent text selection and scrolling during drag
-    if ("touches" in e) {
-      e.preventDefault();
-    }
-  };
-
-  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!dragStart || !isDragging) return;
-
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    const deltaX = clientX - dragStart.x;
-    const deltaY = Math.abs(clientY - dragStart.y);
-
-    // Only drag horizontally if horizontal movement is greater than vertical
-    if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 10) {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragOffset(deltaX);
-    }
-  };
-
-  const handleDragEnd = () => {
-    if (!dragStart || !isDragging) return;
-
-    const threshold = containerWidth * 0.15; // 15% of container width
-
-    if (Math.abs(dragOffset) > threshold) {
-      if (dragOffset > 0) {
-        // Dragged right - go to previous slide
-        setHeroSlideIndex(
-          (prev) => (prev - 1 + heroImages.length) % heroImages.length
-        );
-      } else {
-        // Dragged left - go to next slide
-        setHeroSlideIndex((prev) => (prev + 1) % heroImages.length);
-      }
-    }
-
-    setDragStart(null);
-    setDragOffset(0);
-    setIsDragging(false);
-  };
-
-  // Textile slideshow (Cotton and Linen)
+  // Linen slideshow
   useEffect(() => {
-    if (isTextileHovered || textileSlides.length <= 1 || isTextileDragging)
-      return;
+    if (isLinenHovered || linenImages.length <= 1) return;
 
     const interval = setInterval(() => {
-      setTextileSlideIndex((prev) => (prev + 1) % textileSlides.length);
+      setLinenSlideIndex((prev) => (prev + 1) % linenImages.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isTextileHovered, textileSlides.length, isTextileDragging]);
-
-  // Cotton product slideshow - cycles through all Cotton products
-  useEffect(() => {
-    if (
-      isCottonImageHovered ||
-      cottonProducts.length <= 1 ||
-      textileSlideIndex !== 0
-    )
-      return;
-
-    const interval = setInterval(() => {
-      setCottonProductIndex((prev) => (prev + 1) % cottonProducts.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isCottonImageHovered, cottonProducts.length, textileSlideIndex]);
-
-  // Linen product slideshow - cycles through all Linen products
-  useEffect(() => {
-    if (
-      isLinenImageHovered ||
-      linenProducts.length <= 1 ||
-      textileSlideIndex !== 1
-    )
-      return;
-
-    const interval = setInterval(() => {
-      setLinenProductIndex((prev) => (prev + 1) % linenProducts.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isLinenImageHovered, linenProducts.length, textileSlideIndex]);
-
-  // Textile drag handlers
-  const handleTextileDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    setTextileDragStart({ x: clientX, y: clientY });
-    setTextileDragOffset(0);
-    setIsTextileDragging(true);
-    if ("touches" in e) {
-      e.preventDefault();
-    }
-  };
-
-  const handleTextileDragMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!textileDragStart || !isTextileDragging) return;
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    const deltaX = clientX - textileDragStart.x;
-    const deltaY = Math.abs(clientY - textileDragStart.y);
-    if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 10) {
-      e.preventDefault();
-      e.stopPropagation();
-      setTextileDragOffset(deltaX);
-    }
-  };
-
-  const handleTextileDragEnd = () => {
-    if (!textileDragStart || !isTextileDragging) return;
-    const threshold = textileContainerWidth * 0.15 || 100;
-    if (Math.abs(textileDragOffset) > threshold) {
-      if (textileDragOffset > 0) {
-        setTextileSlideIndex(
-          (prev) => (prev - 1 + textileSlides.length) % textileSlides.length
-        );
-      } else {
-        setTextileSlideIndex((prev) => (prev + 1) % textileSlides.length);
-      }
-    }
-    setTextileDragStart(null);
-    setTextileDragOffset(0);
-    setIsTextileDragging(false);
-  };
-
-  const handlePrevSlide = () => {
-    setTextileSlideIndex(
-      (prev) => (prev - 1 + textileSlides.length) % textileSlides.length
-    );
-  };
-
-  const handleNextSlide = () => {
-    setTextileSlideIndex((prev) => (prev + 1) % textileSlides.length);
-  };
+  }, [isLinenHovered, linenImages.length]);
 
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section
-        ref={heroImageRef}
-        className="relative min-h-[100vh] flex items-center justify-center overflow-hidden select-none"
-        style={{
-          marginTop: "-80px",
-          paddingTop: "80px",
-          cursor: isDragging ? "grabbing" : "grab",
-          touchAction: "pan-y pinch-zoom",
-        }}
-        onMouseEnter={() => setIsHeroHovered(true)}
-        onMouseLeave={() => {
-          setIsHeroHovered(false);
-          if (isDragging) handleDragEnd();
-        }}
-        onMouseDown={handleDragStart}
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
-      >
-        {/* Background Image Carousel */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
+        {/* Left Column - Text Content */}
         <div
-          ref={heroContainerRef}
-          className="absolute inset-0"
-          style={{
-            transform: `translateY(${scrollY * 0.3}px)`,
-            willChange: "transform",
-          }}
+          className="flex flex-col justify-center"
+          style={{ backgroundColor: "var(--card)" }}
         >
-          {heroImages.map((image, index) => {
-            const isActive = index === heroSlideIndex;
-            const isNext = index === (heroSlideIndex + 1) % heroImages.length;
-            const isPrev =
-              index ===
-              (heroSlideIndex - 1 + heroImages.length) % heroImages.length;
-
-            // Calculate position based on drag - use containerWidth for responsiveness
-            let translateX = 0;
-            const width =
-              containerWidth || heroContainerRef.current?.offsetWidth || 0;
-
-            if (isDragging && dragOffset !== 0 && width > 0) {
-              if (isActive) {
-                translateX = dragOffset;
-              } else if (isNext && dragOffset < 0) {
-                translateX = dragOffset + width;
-              } else if (isPrev && dragOffset > 0) {
-                translateX = dragOffset - width;
-              }
-            }
-
-            return (
-              <div
-                key={index}
-                className="absolute inset-0"
-                style={{
-                  opacity: isActive
-                    ? 1
-                    : (isNext || isPrev) && isDragging
-                    ? 0.4
-                    : 0,
-                  zIndex: isActive ? 2 : isNext || isPrev ? 1 : 0,
-                  transform: `translateX(${translateX}px)`,
-                  transition: isDragging
-                    ? "none"
-                    : "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-out",
-                  willChange: isDragging ? "transform" : "auto",
-                }}
+          <div className="container-padding py-16 lg:py-24">
+            <div className="max-w-lg">
+              <p
+                className="text-sm md:text-base uppercase tracking-wider mb-4 font-medium"
+                style={{ color: "var(--muted-foreground)" }}
               >
-                <ImageWithLoader
-                  src={getAssetPath(image)}
-                  alt={`Hero slide ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  style={{ minHeight: "120%", pointerEvents: "none" }}
-                />
-              </div>
-            );
-          })}
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/30 z-10 pointer-events-none"></div>
+                CURATED TEXTILES
+              </p>
+              <h1
+                className="heading-large mb-8 leading-tight"
+                style={{ color: "var(--foreground)" }}
+              >
+                Artistry in Every Thread
+            </h1>
+              <p
+                className="text-base md:text-lg mb-10 leading-relaxed"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                A carefully curated collection of exceptional fabrics, sourced
+                from the finest mills across Britain and beyond.
+              </p>
+              <Link
+                to="/products"
+                className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit"
+                style={{
+                  backgroundColor: "var(--primary)",
+                  color: "var(--primary-foreground)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              >
+                VIEW COLLECTION
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* Text Content Overlay */}
-        <div className="relative z-10 container-padding text-center max-w-4xl">
-          <p
-            className="text-xs sm:text-sm md:text-base uppercase mb-3 sm:mb-4 font-medium text-white/90 px-2"
-            style={{ letterSpacing: isMobile ? "4px" : "6px" }}
-          >
-            {t('tableLinenMadeWithLove')}
-          </p>
-          <h1
-            className="mb-6 md:mb-8 leading-tight text-white"
-            style={{ 
-              fontSize: isMobile ? "clamp(2.5rem, 8vw, 5.75rem)" : "92px"
-            }}
-          >
-            {t('heroTitle')}
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto px-2">
-            {t('heroDescription')}
-          </p>
-          <Link
-            ref={heroButtonRef}
-            to="/products"
-            className="font-semibold py-3 px-6 sm:py-4 sm:px-8 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit text-sm sm:text-base"
+        {/* Right Column - Product Image */}
+        <div ref={heroImageRef} className="relative overflow-hidden">
+          <div
+            className="absolute inset-0"
             style={{
-              backgroundColor: isHeroButtonHovered ? "transparent" : "white",
-              color: isHeroButtonHovered ? "white" : "rgb(17, 24, 39)",
-              border: isHeroButtonHovered
-                ? "2px solid white"
-                : "2px solid transparent",
-              transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+              transform: `translateY(${scrollY * 0.3}px)`,
+              willChange: "transform",
             }}
-            onMouseEnter={() => setIsHeroButtonHovered(true)}
-            onMouseLeave={() => setIsHeroButtonHovered(false)}
           >
-            {t('viewCollection')}
-            <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        {/* Delivery Info Overlay */}
-        <div
-          ref={deliveryOverlayRef}
-          className={`absolute bottom-4 right-4 sm:bottom-8 sm:right-8 backdrop-blur-sm p-4 sm:p-6 shadow-lg max-w-[calc(100%-2rem)] sm:max-w-xs transition-all duration-300 ${
-            isMobile || isDeliveryOverlayTransparent
-              ? "bg-transparent"
-              : "bg-white/90"
-          }`}
-        >
-          <p
-            className={`text-xs sm:text-sm mb-2 transition-colors duration-300 ${
-              isMobile || isDeliveryOverlayTransparent
-                ? "text-white"
-                : "text-gray-900"
-            }`}
-            style={{ letterSpacing: isMobile ? "4px" : "6px" }}
+            <img
+              src={getAssetPath("/products/2-carrara-marble-tablecloth/main.jpg")}
+              alt="Carrara Marble Tablecloth"
+              className="w-full h-full object-cover"
+              style={{ minHeight: "120%" }}
+            />
+          </div>
+          {/* Establishment Info Overlay */}
+          <div
+            className="absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs"
+            style={{ backgroundColor: "var(--card)" }}
           >
-            {t('deliveryHours')}
-          </p>
-          <p
-            className={`text-xs sm:text-sm leading-relaxed transition-colors duration-300 ${
-              isMobile || isDeliveryOverlayTransparent
-                ? "text-white/90"
-                : "text-gray-700"
-            }`}
-          >
-            {t('deliveryHoursText')}
-          </p>
+            <p
+              className="text-sm font-semibold mb-2"
+              style={{ color: "var(--foreground)" }}
+            >
+              ESTABLISHED 2005
+            </p>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              Twenty years of excellence in textile craftsmanship
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Exceptional Textiles Section */}
+      {/* Collection Introduction Section */}
       <section
-        ref={textilesSectionRef}
-        className="section-padding w-full relative"
+        className="section-padding w-full"
         style={{ backgroundColor: "#ffffff" }}
       >
         <div className="max-w-7xl mx-auto container-padding text-center">
           <p
-            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
-            style={{
-              color: "var(--muted-foreground)",
-              letterSpacing: isMobile ? "4px" : "6px",
-            }}
-          >
-            {t('ourCollection')}
-          </p>
-          <h2
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
-            style={{ color: "var(--foreground)" }}
-          >
-            {t('exceptionalTextiles')}
-          </h2>
-          <p
-            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
+            className="text-sm md:text-base uppercase tracking-widest mb-6 font-medium"
             style={{ color: "var(--muted-foreground)" }}
           >
-            {t('exceptionalTextilesDescription')}
+            OUR COLLECTION
+          </p>
+          <h2
+            className="heading-large mb-8"
+            style={{ color: "var(--foreground)" }}
+          >
+            Exceptional Textiles
+          </h2>
+          <p
+            className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            Each fabric in our collection is chosen for its unique character,
+            quality, and the artistry behind its creation
           </p>
         </div>
       </section>
 
-      {/* Textile Category Section (Cotton & Linen Slider) */}
-      <section
-        ref={textileContainerRef}
-        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative select-none overflow-hidden"
-        style={{
-          cursor: isTextileDragging ? "grabbing" : "grab",
-          touchAction: "pan-y pinch-zoom",
-        }}
-        onMouseEnter={() => setIsTextileHovered(true)}
-        onMouseLeave={() => {
-          setIsTextileHovered(false);
-          if (isTextileDragging) handleTextileDragEnd();
-        }}
-        onMouseDown={handleTextileDragStart}
-        onMouseMove={handleTextileDragMove}
-        onMouseUp={handleTextileDragEnd}
-        onTouchStart={handleTextileDragStart}
-        onTouchMove={handleTextileDragMove}
-        onTouchEnd={handleTextileDragEnd}
-      >
-        {textileSlides.map((slide, slideIndex) => {
-          const isActive = slideIndex === textileSlideIndex;
-          const isNext =
-            slideIndex === (textileSlideIndex + 1) % textileSlides.length;
-          const isPrev =
-            slideIndex ===
-            (textileSlideIndex - 1 + textileSlides.length) %
-              textileSlides.length;
-
-          let translateX = 0;
-          const width =
-            textileContainerWidth ||
-            textileContainerRef.current?.offsetWidth ||
-            0;
-
-          if (isTextileDragging && textileDragOffset !== 0 && width > 0) {
-            if (isActive) {
-              translateX = textileDragOffset;
-            } else if (isNext && textileDragOffset < 0) {
-              translateX = textileDragOffset + width;
-            } else if (isPrev && textileDragOffset > 0) {
-              translateX = textileDragOffset - width;
-            }
-          }
-
-          const isCotton = slide.category === "Cotton";
-
-          return (
-            <div
-              key={slideIndex}
-              className="absolute inset-0 grid grid-cols-1 lg:grid-cols-2"
-              style={{
-                opacity: isActive
-                  ? 1
-                  : (isNext || isPrev) && isTextileDragging
-                  ? 0.4
-                  : 0,
-                zIndex: isActive ? 2 : isNext || isPrev ? 1 : 0,
-                transform: `translateX(${translateX}px)`,
-                transition: isTextileDragging
-                  ? "none"
-                  : "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-out",
-                willChange: isTextileDragging ? "transform" : "auto",
-                pointerEvents: isActive ? "auto" : "none",
-              }}
-            >
-              {/* Image Column - Left for both Cotton and Linen */}
+      {/* Cotton Category Section */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative">
+        {/* Left Column - Product Image Slideshow */}
+        <div
+          className="relative overflow-hidden"
+          onMouseEnter={() => setIsCottonHovered(true)}
+          onMouseLeave={() => setIsCottonHovered(false)}
+        >
+          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
+            {cottonImages.map((image, index) => (
               <div
-                className="relative overflow-hidden"
-                onMouseEnter={() => {
-                  if (isCotton) setIsCottonImageHovered(true);
-                  else setIsLinenImageHovered(true);
-                }}
-                onMouseLeave={() => {
-                  if (isCotton) setIsCottonImageHovered(false);
-                  else setIsLinenImageHovered(false);
+                key={index}
+                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                style={{
+                  opacity: index === cottonSlideIndex ? 1 : 0,
+                  zIndex: index === cottonSlideIndex ? 1 : 0,
                 }}
               >
-                <div
-                  className="relative w-full h-full"
-                  style={{ minHeight: "80vh" }}
-                >
-                  {slide.products.map((product, productIndex) => {
-                    const currentProductIndex = isCotton
-                      ? cottonProductIndex
-                      : linenProductIndex;
-                    const isProductActive =
-                      productIndex === currentProductIndex;
-
-                    return (
-                      <div
-                        key={product.id}
-                        className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                        style={{
-                          opacity: isProductActive ? 1 : 0,
-                          zIndex: isProductActive ? 1 : 0,
-                        }}
-                      >
-                        <ImageWithLoader
-                          src={getAssetPath(product.image)}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                          style={{ pointerEvents: "none" }}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                <img
+                  src={image}
+                  alt={`Pink coral Tablecloth - View ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Text Column - Right for both Cotton and Linen */}
-              <div
-                className="flex flex-col justify-center relative"
-                style={{ backgroundColor: "var(--card)" }}
+        {/* Right Column - Text Content */}
+        <div
+          className="flex flex-col justify-center relative"
+          style={{ backgroundColor: "var(--card)" }}
+        >
+          <div className="container-padding py-16 lg:py-24">
+            <div className="max-w-lg text-center lg:text-left">
+              <p
+                className="text-xs md:text-sm uppercase tracking-widest mb-4 font-medium"
+                style={{ color: "var(--muted-foreground)" }}
               >
-                <div className="container-padding py-12 sm:py-16 lg:py-24">
-                  <div className="max-w-lg text-center lg:text-left lg:pl-8">
-                    <p
-                      className="text-xs sm:text-sm md:text-sm uppercase mb-3 sm:mb-4 font-medium section-subtitle"
-                      style={{
-                        color: "var(--muted-foreground)",
-                        letterSpacing: isMobile ? "4px" : "6px",
-                      }}
-                    >
-                      {slide.subtitle}
-                    </p>
-                    <h2
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-4 sm:mb-6 leading-tight"
-                      style={{ color: "var(--foreground)" }}
-                    >
-                      {slide.title}
-                    </h2>
-                    <p
-                      className="text-sm sm:text-base md:text-lg mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
-                      style={{ color: "var(--muted-foreground)" }}
-                    >
-                      {slide.description}
-                    </p>
-                    <Link
-                      to={slide.link}
-                      className="text-xs sm:text-sm uppercase tracking-widest font-semibold inline-flex items-center group transition-all duration-300"
-                      style={{
-                        color: "var(--foreground)",
-                        borderBottom: "1px solid var(--primary)",
-                        paddingBottom: "4px",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "var(--primary)";
-                        e.currentTarget.style.borderBottomColor = "transparent";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "var(--foreground)";
-                        e.currentTarget.style.borderBottomColor =
-                          "var(--primary)";
-                      }}
-                    >
-                      {slide.linkText}
-                    </Link>
-                  </div>
-                </div>
-              </div>
+                EVERYDAY LUXURY
+              </p>
+              <h2
+                className="heading-large mb-6 leading-tight"
+                style={{ color: "var(--foreground)" }}
+              >
+                Cotton
+              </h2>
+              <p
+                className="text-base md:text-lg mb-10 leading-relaxed"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                Soft, breathable cotton in an array of sophisticated hues and
+                weaves
+              </p>
+              <Link
+                to="/products?category=Cotton"
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group border-b-2 pb-1"
+                style={{
+                  color: "var(--foreground)",
+                  borderColor: "var(--primary)",
+                }}
+              >
+                EXPLORE COTTON
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-          );
-        })}
-        {/* Navigation arrows */}
-        {textileSlides.length > 1 && (
-          <>
-            <button
-              onClick={handlePrevSlide}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
-              style={{
-                width: isMobile ? "40px" : "48px",
-                height: isMobile ? "40px" : "48px",
-                backgroundColor: "white",
-                border: "2px solid transparent",
-                color: "rgb(17, 24, 39)",
-                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = "white";
-                e.currentTarget.style.border = "2px solid white";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "white";
-                e.currentTarget.style.color = "rgb(17, 24, 39)";
-                e.currentTarget.style.border = "2px solid transparent";
-              }}
-              aria-label="Previous slide"
-            >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-            <button
-              onClick={handleNextSlide}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center transition-all duration-200"
-              style={{
-                width: isMobile ? "40px" : "48px",
-                height: isMobile ? "40px" : "48px",
-                backgroundColor: "white",
-                border: "2px solid transparent",
-                color: "rgb(17, 24, 39)",
-                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = "white";
-                e.currentTarget.style.border = "2px solid white";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "white";
-                e.currentTarget.style.color = "rgb(17, 24, 39)";
-                e.currentTarget.style.border = "2px solid transparent";
-              }}
-              aria-label="Next slide"
-            >
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          </>
-        )}
+          </div>
+        </div>
+      </section>
+
+      {/* Linen Category Section */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative">
+        {/* Left Column - Text Content */}
+        <div
+          className="flex flex-col justify-center order-2 lg:order-1 relative"
+          style={{ backgroundColor: "var(--card)" }}
+        >
+          <div className="container-padding py-16 lg:py-24 relative z-10">
+            <div className="max-w-lg text-center lg:text-left">
+              <p
+                className="text-xs md:text-sm uppercase tracking-widest mb-4 font-medium"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                TIMELESS ELEGANCE
+              </p>
+              <h2
+                className="heading-large mb-6 leading-tight"
+                style={{ color: "var(--foreground)" }}
+              >
+                Linen
+              </h2>
+              <p
+                className="text-base md:text-lg mb-10 leading-relaxed"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                Luxurious linen with an exquisite drape and natural texture
+              </p>
+              <Link
+                to="/products?category=Linen"
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group border-b-2 pb-1"
+                style={{
+                  color: "var(--foreground)",
+                  borderColor: "var(--primary)",
+                }}
+              >
+                EXPLORE LINEN
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Product Image Slideshow */}
+        <div
+          className="relative overflow-hidden order-1 lg:order-2"
+          onMouseEnter={() => setIsLinenHovered(true)}
+          onMouseLeave={() => setIsLinenHovered(false)}
+        >
+          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
+            {linenImages.map((image, index) => (
+              <div
+                key={index}
+                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                style={{
+                  opacity: index === linenSlideIndex ? 1 : 0,
+                  zIndex: index === linenSlideIndex ? 1 : 0,
+                }}
+              >
+                <img
+                  src={image}
+                  alt={`Reindeer moss Table runner - View ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Our Story Section */}
-      <section
-        className="section-padding w-full relative"
-        style={{ backgroundColor: "#ffffff" }}
-      >
-        <div className="max-w-7xl mx-auto container-padding text-center">
-          <p
-            className="text-xs sm:text-sm md:text-base uppercase mb-4 sm:mb-6 font-medium px-2"
+      <section className="relative min-h-[90vh] overflow-hidden">
+        {/* Background - Fabric Store Image/Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
+          {/* Fabric texture pattern */}
+          <div
+            className="absolute inset-0 opacity-20"
             style={{
-              color: "var(--muted-foreground)",
-              letterSpacing: isMobile ? "4px" : "6px",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='fabric' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Crect width='40' height='40' fill='%23ffffff'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23000000' stroke-width='0.5' opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23fabric)'/%3E%3C/svg%3E")`,
+              backgroundSize: "80px 80px",
             }}
-          >
-            OUR HERITAGE
-          </p>
-          <h2
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 px-2"
-            style={{ color: "var(--foreground)" }}
-          >
-            Two Decades of Textile Excellence
-          </h2>
-          <p
-            className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-2"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            Since 2005, we've been dedicated to sourcing and supplying the
-            finest fabrics, empowering creators with materials that inspire and
-            endure.
-          </p>
+          ></div>
+          {/* Colorful fabric roll representation */}
+          <div className="absolute inset-0">
+            {/* Fabric rolls - various colors */}
+            <div className="absolute top-20 right-10 w-24 h-32 bg-blue-500 opacity-30 transform rotate-12"></div>
+            <div className="absolute top-40 right-32 w-20 h-28 bg-red-500 opacity-30 transform -rotate-12"></div>
+            <div className="absolute top-60 right-52 w-28 h-36 bg-green-500 opacity-30 transform rotate-6"></div>
+            <div className="absolute bottom-40 right-20 w-22 h-30 bg-purple-500 opacity-30 transform -rotate-6"></div>
+            <div className="absolute bottom-60 right-40 w-26 h-34 bg-orange-500 opacity-30 transform rotate-12"></div>
+            <div className="absolute top-32 right-72 w-24 h-32 bg-yellow-500 opacity-30 transform -rotate-12"></div>
+            <div className="absolute bottom-32 right-64 w-20 h-28 bg-pink-500 opacity-30 transform rotate-6"></div>
+          </div>
+        </div>
+
+        {/* Text Overlay - Centered */}
+        <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-24 lg:py-32">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-sm md:text-base text-white/80 uppercase tracking-widest mb-6 font-medium">
+              OUR STORY
+            </p>
+            <h2
+              className="heading-large mb-8 leading-tight"
+              style={{ color: "white" }}
+            >
+              Two Decades of
+              <br />
+              Textile Excellence
+            </h2>
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
+              Since 2005, we&apos;ve been at the heart of Britain&apos;s textile
+              community, championing traditional craftsmanship while embracing
+              innovative design.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Visit Our Atelier Section */}
-      <section className="relative min-h-[90vh] overflow-hidden w-full">
-        {/* Background - Video */}
-        <div className="absolute inset-0">
-          <video
-            key={isMobile ? "mobile" : "hd"}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
+      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
+        {/* Left Column - Fabric Texture Background */}
+        <div className="relative bg-gray-900 overflow-hidden">
+          {/* Blurred fabric texture pattern */}
+          <div
+            className="absolute inset-0 opacity-30"
             style={{
-              pointerEvents: "none",
+              background: `
+              repeating-linear-gradient(90deg, 
+                transparent 0px, 
+                rgba(255,255,255,0.1) 1px, 
+                transparent 2px,
+                transparent 20px
+              ),
+              repeating-linear-gradient(0deg, 
+                transparent 0px, 
+                rgba(255,255,255,0.1) 1px, 
+                transparent 2px,
+                transparent 20px
+              ),
+              linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%),
+              linear-gradient(45deg, rgba(0,0,0,0.1) 0%, transparent 50%)
+            `,
+              filter: "blur(2px)",
             }}
-            src={
-              isMobile
-                ? getAssetPath("videos/atelier-background-mobile.mp4")
-                : getAssetPath("videos/atelier-background-hd.mp4")
-            }
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/30"></div>
+          ></div>
+          {/* Fabric fold patterns */}
+          <div className="absolute inset-0 opacity-20">
+            <div
+              className="absolute top-0 left-0 w-full h-full"
+              style={{
+                background: `
+                repeating-linear-gradient(90deg,
+                  transparent 0px,
+                  rgba(255,255,255,0.15) 2px,
+                  transparent 4px,
+                  transparent 60px
+                )
+              `,
+                transform: "skewY(-2deg)",
+                filter: "blur(1px)",
+              }}
+            ></div>
+            <div
+              className="absolute top-0 left-0 w-full h-full"
+              style={{
+                background: `
+                repeating-linear-gradient(90deg,
+                  transparent 0px,
+                  rgba(0,0,0,0.1) 1px,
+                  transparent 2px,
+                  transparent 80px
+                )
+              `,
+                transform: "skewY(1deg)",
+                filter: "blur(1px)",
+              }}
+            ></div>
+          </div>
         </div>
 
-        {/* Contact Information Overlay */}
-        <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-12 sm:py-16 md:py-24 lg:py-32">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="max-w-2xl mx-auto text-center">
-              <p
-                className="text-xs sm:text-sm md:text-base text-white/80 uppercase mb-4 sm:mb-6 font-medium px-2"
-                style={{ letterSpacing: isMobile ? "4px" : "6px" }}
-              >
-                CONNECT WITH US
+        {/* Right Column - Contact Information */}
+        <div
+          className="flex flex-col justify-center"
+          style={{ backgroundColor: "var(--card)" }}
+        >
+          <div className="container-padding py-16 lg:py-24">
+            <div className="max-w-lg">
+              <p className="text-sm md:text-base text-gray-500 uppercase tracking-widest mb-4 font-medium">
+                GET IN TOUCH
               </p>
               <h2
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 sm:mb-8 leading-tight text-white px-2"
-                style={{ color: "white" }}
+                className="heading-large mb-6 leading-tight"
+                style={{ color: "var(--foreground)" }}
               >
                 Visit Our Atelier
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-white/90 mb-8 sm:mb-12 leading-relaxed max-w-xl mx-auto px-2">
-                Experience our collection firsthand at our London atelier. We
-                welcome you to explore our fabrics and discuss your projects.
+              <p className="text-base md:text-lg text-gray-600 mb-12 leading-relaxed">
+                We welcome you to experience our collection firsthand. Our team
+                is here to guide you through every step of your textile journey.
               </p>
-            </div>
 
-            {/* Contact Information */}
-            <div className="max-w-2xl mx-auto flex justify-center">
-              <div className="space-y-6 sm:space-y-8 w-full px-4">
+              {/* Contact Information */}
+              <div className="space-y-8">
                 {/* Location */}
-                <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex items-start gap-4">
                   <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <MapPin className="h-6 w-6 text-white" />
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Location
                     </h3>
-                    <p className="text-sm sm:text-base text-white/90 leading-relaxed break-words">
-                      123 Fabric Street, London W1U 3QP, UK
+                    <p className="text-gray-600 leading-relaxed">
+                      123 Fabric Street
+                      <br />
+                      Marylebone
+                      <br />
+                      London W1U 3QP
                     </p>
                   </div>
                 </div>
 
                 {/* Opening Hours */}
-                <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex items-start gap-4">
                   <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <Clock className="h-6 w-6 text-white" />
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Opening Hours
                     </h3>
-                    <p className="text-sm sm:text-base text-white/90 leading-relaxed">
-                      We accept and deliver orders on weekdays, from 10 AM to 7
-                      PM.
+                    <p className="text-gray-600 leading-relaxed">
+                      Monday - Friday: 9:00 - 18:00
+                      <br />
+                      Saturday: 10:00 - 16:00
+                      <br />
+                      Sunday: By appointment only
                     </p>
                   </div>
                 </div>
 
                 {/* Telephone */}
-                <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex items-start gap-4">
                   <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <Phone className="h-6 w-6 text-white" />
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Telephone
                     </h3>
-                    <p className="text-sm sm:text-base text-white/90 break-all">
-                      +44 (0) 20 7123 4567
-                    </p>
+                    <p className="text-gray-600">+44 (0) 20 7123 4567</p>
                   </div>
                 </div>
 
                 {/* Email */}
-                <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex items-start gap-4">
                   <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
+                    className="flex-shrink-0 w-12 h-12 flex items-center justify-center"
                     style={{ backgroundColor: "var(--primary)" }}
                   >
-                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <Mail className="h-6 w-6 text-white" />
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Email
                     </h3>
-                    <p className="text-sm sm:text-base text-white/90 break-all">
-                      <a
-                        href="mailto:enquiries@textileshop.co.uk"
-                        className="hover:text-white transition-colors"
-                      >
-                        enquiries@textileshop.co.uk
-                      </a>
-                    </p>
+                    <a
+                      href="mailto:enquiries@textileshop.co.uk"
+                      className="transition-colors"
+                      style={{ color: "var(--muted-foreground)" }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.color = "var(--primary)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.color =
+                          "var(--muted-foreground)")
+                      }
+                    >
+                      enquiries@textileshop.co.uk
+                    </a>
                   </div>
                 </div>
               </div>

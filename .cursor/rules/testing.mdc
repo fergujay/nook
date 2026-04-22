@@ -1,0 +1,48 @@
+---
+description: General testing strategy — what to test and where
+alwaysApply: true
+---
+
+# Testing strategy
+
+This repo uses **Vitest** (unit/integration, jsdom) and **Playwright** (browser E2E). We do **not** use Jest — if you see Jest docs, translate to Vitest (`vi` instead of `jest`, `vitest run` instead of `jest`).
+
+## What goes where
+
+| Layer | Tool | Location | When to use |
+|---|---|---|---|
+| Pure functions / utilities | Vitest | `src/**/*.test.ts` | Default for any logic not tied to the DOM. |
+| Components in isolation | Vitest + Testing Library | `src/**/*.test.tsx` | Rendering, props, context, user events. |
+| Multi-page flows, routing | Playwright | `e2e/**/*.spec.ts` | Anything that needs a real browser, SPA navigation, visual state, or Blob/CDN assets. |
+
+## When adding a feature
+
+1. Start with a Vitest unit or component test that fails.
+2. Implement until it passes.
+3. If the feature crosses pages or relies on a full build (routing, fonts, Blob URLs), add a Playwright spec too.
+4. Never ship a new `src/utils/*.ts` file without a companion `*.test.ts`.
+
+## When fixing a bug
+
+1. Write a regression test (Vitest or Playwright depending on layer) that reproduces the bug.
+2. Fix the code until the test passes.
+3. Commit test and fix together — the test name should describe the bug.
+
+## Required assertions
+
+- Component tests must query by accessible role or label (`getByRole`, `getByLabelText`) before falling back to `getByTestId`. Add `data-testid` only when no accessible query works.
+- Async UI: always `await findBy…` or `await waitFor(…)`. Never arbitrary `setTimeout`.
+- Snapshots are disabled by convention — prefer explicit assertions.
+
+## Running tests
+
+```bash
+yarn test              # one‑shot (CI mode)
+yarn test:watch        # watch
+yarn test:coverage     # v8 coverage report
+yarn e2e               # Playwright against a preview build
+yarn e2e:ui            # Playwright UI mode
+yarn e2e:install       # install browsers (first run or after bumping @playwright/test)
+```
+
+The full gate before any PR is `yarn verify`.
