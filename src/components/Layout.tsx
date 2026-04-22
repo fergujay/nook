@@ -20,6 +20,10 @@ export default function Layout({ children }: LayoutProps) {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Only show transparent header on home page
+  const isHomePage = location.pathname === "/";
+  const showTransparentHeader = isHomePage && !isScrolled;
 
   const navigation = [
     { name: t("nav.home"), href: "/" },
@@ -76,9 +80,11 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen flex flex-col bg-background">
       <header 
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          isScrolled 
-            ? "bg-white/95 backdrop-blur-md shadow-medium border-b border-border" 
-            : "bg-white backdrop-blur-sm shadow-soft border-b border-transparent"
+          showTransparentHeader
+            ? "bg-transparent border-b border-transparent" 
+            : isScrolled
+              ? "bg-white/95 backdrop-blur-md shadow-medium border-b border-border"
+              : "bg-white shadow-soft border-b border-border/50"
         }`}
       >
         <nav className="container-padding">
@@ -87,7 +93,7 @@ export default function Layout({ children }: LayoutProps) {
           }`}>
             <Link to="/" className="flex items-center group">
               <img
-                src="/logo.svg"
+                src={showTransparentHeader ? "/logo-white.svg" : "/logo.svg"}
                 alt="Nook"
                 className={`transition-all duration-300 group-hover:scale-105 ${
                   isScrolled ? "h-5" : "h-6"
@@ -101,14 +107,20 @@ export default function Layout({ children }: LayoutProps) {
                   key={item.href}
                   to={item.href}
                   className={`text-sm font-medium transition-all duration-300 relative py-2 group ${
-                    location.pathname === item.href
-                      ? "text-primary"
-                      : "text-foreground/70 hover:text-foreground"
+                    showTransparentHeader
+                      ? location.pathname === item.href
+                        ? "text-white"
+                        : "text-white/80 hover:text-white"
+                      : location.pathname === item.href
+                        ? "text-primary"
+                        : "text-foreground/70 hover:text-foreground"
                   }`}
                 >
                   {item.name}
                   <span 
-                    className={`absolute -bottom-0.5 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                    className={`absolute -bottom-0.5 left-0 h-0.5 transition-all duration-300 ${
+                      showTransparentHeader ? "bg-white" : "bg-primary"
+                    } ${
                       location.pathname === item.href 
                         ? "w-full" 
                         : "w-0 group-hover:w-full"
