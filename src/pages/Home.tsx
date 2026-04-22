@@ -7,10 +7,27 @@ import { useLanguage } from "../contexts/LanguageContext";
 
 const CONTACT_EMAIL = "nook.textile@gmail.com";
 
+const HERO_IMAGES = [
+  "/slider/hero-slider-01.jpg",
+  "/slider/hero-slider-02.jpg",
+  "/slider/hero-slider-03.jpg",
+  "/slider/hero-slider-04.jpg",
+  "/slider/hero-slider-05.jpg",
+  "/slider/hero-slider-06.jpg",
+  "/slider/hero-slider-07.jpg",
+  "/slider/hero-slider-08.jpg",
+  "/slider/hero-slider-09.jpg",
+  "/slider/hero-slider-10.jpg",
+  "/slider/hero-slider-11.jpg",
+  "/slider/hero-slider-12.jpg",
+];
+
 export default function Home() {
   const { t } = useLanguage();
   const [scrollY, setScrollY] = useState(0);
   const heroImageRef = useRef<HTMLDivElement>(null);
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
   const [cottonSlideIndex, setCottonSlideIndex] = useState(0);
   const [linenSlideIndex, setLinenSlideIndex] = useState(0);
   const [isCottonHovered, setIsCottonHovered] = useState(false);
@@ -28,6 +45,14 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isHeroHovered || HERO_IMAGES.length <= 1) return;
+    const interval = setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isHeroHovered]);
 
   useEffect(() => {
     if (isCottonHovered || cottonImages.length <= 1) return;
@@ -48,80 +73,75 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
+      <section
+        ref={heroImageRef}
+        className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden"
+        onMouseEnter={() => setIsHeroHovered(true)}
+        onMouseLeave={() => setIsHeroHovered(false)}
+      >
         <div
-          className="flex flex-col justify-center"
-          style={{ backgroundColor: "var(--card)" }}
+          className="absolute inset-0"
+          style={{
+            transform: `translateY(${scrollY * 0.3}px)`,
+            willChange: "transform",
+          }}
         >
-          <div className="container-padding py-16 lg:py-24">
-            <div className="max-w-lg">
-              <p
-                className="text-sm md:text-base uppercase tracking-wider mb-4 font-medium"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {t("home.heroEyebrow")}
-              </p>
-              <h1
-                className="heading-large mb-8 leading-tight"
-                style={{ color: "var(--foreground)" }}
-              >
-                {t("home.heroTitle")}
-              </h1>
-              <p
-                className="text-base md:text-lg mb-10 leading-relaxed"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {t("home.heroLead")}
-              </p>
-              <Link
-                to="/products"
-                className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit"
-                style={{
-                  backgroundColor: "var(--primary)",
-                  color: "var(--primary-foreground)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-              >
-                {t("home.heroCta")}
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+          {HERO_IMAGES.map((image, index) => (
+            <div
+              key={image}
+              className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+              style={{
+                opacity: index === heroSlideIndex ? 1 : 0,
+                zIndex: index === heroSlideIndex ? 1 : 0,
+              }}
+            >
+              <img
+                src={getAssetPath(image)}
+                alt={`Hero slide ${index + 1}`}
+                className="w-full h-full object-cover"
+                style={{ minHeight: "120%" }}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
             </div>
-          </div>
+          ))}
+          <div className="absolute inset-0 bg-black/35 z-10" />
         </div>
 
-        <div ref={heroImageRef} className="relative overflow-hidden">
-          <div
-            className="absolute inset-0"
-            style={{
-              transform: `translateY(${scrollY * 0.3}px)`,
-              willChange: "transform",
-            }}
+        <div className="relative z-10 container-padding text-center max-w-4xl">
+          <p className="text-sm md:text-base uppercase tracking-widest mb-4 font-medium text-white/90">
+            {t("home.heroEyebrow")}
+          </p>
+          <h1 className="heading-large mb-8 leading-tight text-white">
+            {t("home.heroTitle")}
+          </h1>
+          <p className="text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto">
+            {t("home.heroLead")}
+          </p>
+          <Link
+            to="/products"
+            className="font-semibold py-4 px-8 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center justify-center group w-fit bg-white text-gray-900 hover:bg-white/90"
           >
-            <img
-              src={getAssetPath("/products/2-carrara-marble-tablecloth/main.jpg")}
-              alt="Carrara Marble Tablecloth"
-              className="w-full h-full object-cover"
-              style={{ minHeight: "120%" }}
-            />
-          </div>
-          <div
-            className="absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs"
-            style={{ backgroundColor: "var(--card)" }}
+            {t("home.heroCta")}
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+
+        <div
+          className="hidden md:block absolute bottom-8 right-8 backdrop-blur-sm p-6 shadow-lg max-w-xs z-10"
+          style={{ backgroundColor: "rgba(255,255,255,0.92)" }}
+        >
+          <p
+            className="text-sm font-semibold mb-2 uppercase tracking-widest"
+            style={{ color: "var(--foreground)" }}
           >
-            <p
-              className="text-sm font-semibold mb-2"
-              style={{ color: "var(--foreground)" }}
-            >
-              {t("home.heroOverlayTitle")}
-            </p>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              {t("home.heroOverlayText")}
-            </p>
-          </div>
+            {t("home.heroOverlayTitle")}
+          </p>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            {t("home.heroOverlayText")}
+          </p>
         </div>
       </section>
 
