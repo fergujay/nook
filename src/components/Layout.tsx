@@ -77,8 +77,8 @@ export default function Layout({ children }: LayoutProps) {
       <header 
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled 
-            ? "bg-card/95 backdrop-blur-md shadow-medium border-b border-border" 
-            : "bg-card/80 backdrop-blur-sm shadow-soft border-b border-transparent"
+            ? "bg-white/95 backdrop-blur-md shadow-medium border-b border-border" 
+            : "bg-white backdrop-blur-sm shadow-soft border-b border-transparent"
         }`}
       >
         <nav className="container-padding">
