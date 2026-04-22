@@ -1,68 +1,46 @@
-import { Droplet, Sun, Shirt, Wind } from "lucide-react";
+import { Droplet, Sun, Shirt, Wind } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function TextileCare() {
-  const careTips = [
+  const { t, tList } = useLanguage()
+
+  const sections = [
     {
       icon: Droplet,
-      title: "Washing",
-      tips: [
-        "Always check the care label before washing",
-        "Use cold or warm water (not hot)",
-        "Use mild, eco-friendly detergents",
-        "Wash similar colors together",
-        "Avoid overloading the washing machine",
-      ],
+      title: t('textileCare.sections.washing.title'),
+      tips: tList('textileCare.sections.washing.tips'),
     },
     {
       icon: Sun,
-      title: "Drying",
-      tips: [
-        "Air dry when possible to preserve fabric quality",
-        "Avoid direct sunlight for colored fabrics",
-        "Use low heat settings if using a dryer",
-        "Remove promptly to prevent wrinkles",
-        "Hang or lay flat to maintain shape",
-      ],
+      title: t('textileCare.sections.drying.title'),
+      tips: tList('textileCare.sections.drying.tips'),
     },
     {
       icon: Shirt,
-      title: "Ironing",
-      tips: [
-        "Check fabric care label for temperature settings",
-        "Use steam for stubborn wrinkles",
-        "Iron on the reverse side for delicate fabrics",
-        "Never iron directly on prints or embroidery",
-        "Let fabric cool before storing",
-      ],
+      title: t('textileCare.sections.ironing.title'),
+      tips: tList('textileCare.sections.ironing.tips'),
     },
     {
       icon: Wind,
-      title: "Storage",
-      tips: [
-        "Store in a cool, dry place",
-        "Use breathable storage containers",
-        "Avoid plastic bags for long-term storage",
-        "Fold properly to prevent creasing",
-        "Keep away from direct sunlight",
-      ],
+      title: t('textileCare.sections.storage.title'),
+      tips: tList('textileCare.sections.storage.tips'),
     },
-  ];
+  ]
 
   return (
     <div className="max-w-7xl mx-auto container-padding py-16">
       <div className="text-center mb-20">
-        <h1 className="heading-medium mb-6">How to Care for Your Textiles</h1>
+        <h1 className="heading-medium mb-6">{t('textileCare.title')}</h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Proper care ensures your textiles stay beautiful and last longer.
-          Follow these guidelines to maintain the quality of your purchases.
+          {t('textileCare.lead')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {careTips.map((section, index) => {
-          const Icon = section.icon;
+        {sections.map((section) => {
+          const Icon = section.icon
           return (
-            <div key={index} className="card-hover">
+            <div key={section.title} className="card-hover">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-4 bg-primary-100 rounded-xl shadow-soft">
                   <Icon className="h-7 w-7 text-primary-600" />
@@ -78,39 +56,23 @@ export default function TextileCare() {
                 ))}
               </ul>
             </div>
-          );
+          )
         })}
       </div>
 
       <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-2 border-primary-200">
-        <h2 className="text-2xl font-medium mb-6">General Care Guidelines</h2>
-        <div className="space-y-4 text-gray-700 leading-relaxed">
-          <p className="text-lg">
-            <strong className="text-primary-700">Read the Label:</strong> Always
-            check the care label on your textiles. It contains specific
-            instructions for that particular fabric.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Sort by Color:</strong>{" "}
-            Separate whites, lights, and darks to prevent color bleeding.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Use Gentle Cycles:</strong> For
-            delicate fabrics, use the gentle or delicate cycle on your washing
-            machine.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Avoid Harsh Chemicals:</strong>{" "}
-            Use mild detergents and avoid bleach unless specifically
-            recommended.
-          </p>
-          <p className="text-lg">
-            <strong className="text-primary-700">Regular Maintenance:</strong>{" "}
-            Regular cleaning and proper storage will extend the life of your
-            textiles significantly.
-          </p>
-        </div>
+        <h2 className="text-2xl font-medium mb-6">
+          {t('textileCare.notesTitle')}
+        </h2>
+        <ul className="space-y-3 text-gray-700 leading-relaxed">
+          {tList('textileCare.notesItems').map((note, idx) => (
+            <li key={idx} className="flex items-start gap-3 text-lg">
+              <span className="text-primary-600 mt-1.5 font-bold">•</span>
+              <span>{note}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
-  );
+  )
 }

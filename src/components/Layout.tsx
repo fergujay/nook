@@ -1,30 +1,33 @@
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Menu, X, Globe } from "lucide-react";
+import { ShoppingBag, Menu, X, Globe, Heart } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
+import { useFavorites } from "../contexts/FavoritesContext";
 import { useLanguage } from "../contexts/LanguageContext";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
+const CONTACT_EMAIL = "nook.textile@gmail.com";
+
 export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const { totalItems } = useCart();
+  const { items: favoriteItems } = useFavorites();
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const languageMenuRef = useRef<HTMLDivElement>(null);
 
   const navigation = [
-    { name: t("home"), href: "/" },
-    { name: t("products"), href: "/products" },
-    { name: t("aboutUs"), href: "/about" },
-    { name: t("textileCare"), href: "/textile-care" },
-    { name: t("courier"), href: "/courier" },
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.products"), href: "/products" },
+    { name: t("nav.aboutUs"), href: "/about" },
+    { name: t("nav.textileCare"), href: "/textile-care" },
+    { name: t("nav.courier"), href: "/courier" },
   ];
 
-  // Close language menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -44,6 +47,8 @@ export default function Layout({ children }: LayoutProps) {
     };
   }, [languageMenuOpen]);
 
+  const year = new Date().getFullYear();
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="bg-white/95 backdrop-blur-sm shadow-soft sticky top-0 z-50 border-b border-gray-100 w-full">
@@ -57,7 +62,6 @@ export default function Layout({ children }: LayoutProps) {
               />
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex md:items-center md:space-x-10">
               {navigation.map((item) => (
                 <Link
@@ -80,9 +84,7 @@ export default function Layout({ children }: LayoutProps) {
               ))}
             </div>
 
-            {/* Actions */}
             <div className="flex items-center space-x-3">
-              {/* Language Selector */}
               <div className="relative" ref={languageMenuRef}>
                 <button
                   onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
@@ -96,7 +98,7 @@ export default function Layout({ children }: LayoutProps) {
                     e.currentTarget.style.color = "var(--muted-foreground)";
                     e.currentTarget.style.backgroundColor = "transparent";
                   }}
-                  aria-label="Language"
+                  aria-label={t("common.language")}
                 >
                   <Globe className="h-5 w-5" />
                   <span className="hidden lg:inline text-sm font-medium uppercase">
@@ -141,6 +143,33 @@ export default function Layout({ children }: LayoutProps) {
                 )}
               </div>
               <Link
+                to="/favorites"
+                className="relative p-2.5 transition-all duration-200"
+                style={{ color: "var(--muted-foreground)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "var(--primary)";
+                  e.currentTarget.style.backgroundColor = "var(--muted)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "var(--muted-foreground)";
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+                aria-label={t("nav.favorites")}
+              >
+                <Heart className="h-6 w-6" />
+                {favoriteItems.length > 0 && (
+                  <span
+                    className="absolute top-1 right-1 text-xs h-5 w-5 flex items-center justify-center font-semibold shadow-md"
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                    }}
+                  >
+                    {favoriteItems.length}
+                  </span>
+                )}
+              </Link>
+              <Link
                 to="/cart"
                 className="relative p-2.5 transition-all duration-200"
                 style={{ color: "var(--muted-foreground)" }}
@@ -152,7 +181,7 @@ export default function Layout({ children }: LayoutProps) {
                   e.currentTarget.style.color = "var(--muted-foreground)";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
-                aria-label={t("cart")}
+                aria-label={t("nav.cart")}
               >
                 <ShoppingBag className="h-6 w-6" />
                 {totalItems > 0 && (
@@ -188,7 +217,6 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {mobileMenuOpen && (
             <div className="md:hidden py-6 border-t border-gray-200 animate-fade-in">
               {navigation.map((item) => (
@@ -205,11 +233,10 @@ export default function Layout({ children }: LayoutProps) {
                   {item.name}
                 </Link>
               ))}
-              {/* Mobile Language Selector */}
               <div className="pt-4 border-t border-gray-200 mt-4">
                 <div className="flex items-center justify-between px-4">
                   <span className="text-sm font-medium text-gray-700">
-                    Language
+                    {t("common.language")}
                   </span>
                   <div className="flex gap-2">
                     <button
@@ -229,18 +256,6 @@ export default function Layout({ children }: LayoutProps) {
                               color: "var(--muted-foreground)",
                             }
                       }
-                      onMouseEnter={(e) => {
-                        if (language !== "en") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--border)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (language !== "en") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--muted)";
-                        }
-                      }}
                     >
                       EN
                     </button>
@@ -261,18 +276,6 @@ export default function Layout({ children }: LayoutProps) {
                               color: "var(--muted-foreground)",
                             }
                       }
-                      onMouseEnter={(e) => {
-                        if (language !== "sr") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--border)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (language !== "sr") {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--muted)";
-                        }
-                      }}
                     >
                       SR
                     </button>
@@ -295,32 +298,29 @@ export default function Layout({ children }: LayoutProps) {
         }}
       >
         <div className="container-padding py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Left Column - TEXTILE SHOP */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
-              <img src="/logo-white.svg" alt="Nook" className="h-6 mb-4" />
-              <h3
-                className="text-lg font-semibold mb-4 uppercase"
-                style={{ color: "#d3d3d3" }}
-              >
-                TEXTILE SHOP
-              </h3>
+              <img src="/logo-white.svg" alt="NOOK" className="h-6 mb-4" />
               <p
-                className="text-sm leading-relaxed max-w-md"
+                className="text-sm leading-relaxed max-w-xs"
                 style={{ color: "#d3d3d3" }}
               >
-                Curating exceptional textiles for discerning designers, makers,
-                and enthusiasts since 2005.
+                {t("footer.tagline")}
+              </p>
+              <p
+                className="text-xs mt-6 leading-relaxed"
+                style={{ color: "rgba(211,211,211,0.7)" }}
+              >
+                {t("footer.sinceLine").replace("{year}", String(year))}
               </p>
             </div>
 
-            {/* Middle Column - QUICK LINKS */}
             <div>
               <h3
-                className="text-sm font-medium mb-4 uppercase"
+                className="text-sm font-medium mb-4 uppercase tracking-widest"
                 style={{ color: "#d3d3d3" }}
               >
-                QUICK LINKS
+                {t("footer.quickLinks")}
               </h3>
               <ul className="space-y-2 text-sm" style={{ color: "#d3d3d3" }}>
                 <li>
@@ -328,7 +328,7 @@ export default function Layout({ children }: LayoutProps) {
                     to="/products"
                     className="hover:opacity-80 transition-opacity"
                   >
-                    Our Collection
+                    {t("footer.linkCollection")}
                   </Link>
                 </li>
                 <li>
@@ -336,59 +336,109 @@ export default function Layout({ children }: LayoutProps) {
                     to="/about"
                     className="hover:opacity-80 transition-opacity"
                   >
-                    About Us
+                    {t("footer.linkAbout")}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/about"
+                    to="/textile-care"
                     className="hover:opacity-80 transition-opacity"
                   >
-                    Visit Our Atelier
+                    {t("footer.linkCare")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/courier"
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {t("footer.linkDelivery")}
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Right Column - CONTACT */}
             <div>
               <h3
-                className="text-sm font-medium mb-4 uppercase"
+                className="text-sm font-medium mb-4 uppercase tracking-widest"
                 style={{ color: "#d3d3d3" }}
               >
-                CONTACT
+                {t("footer.policies")}
               </h3>
               <ul className="space-y-2 text-sm" style={{ color: "#d3d3d3" }}>
-                <li>123 Fabric Street</li>
-                <li>London W1U 3QP</li>
                 <li>
-                  <a
-                    href="tel:+442071234567"
+                  <Link
+                    to="/returns"
                     className="hover:opacity-80 transition-opacity"
                   >
-                    +44 (0) 20 7123 4567
-                  </a>
+                    {t("footer.linkReturns")}
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="mailto:enquiries@textileshop.co.uk"
+                  <Link
+                    to="/terms"
                     className="hover:opacity-80 transition-opacity"
                   >
-                    enquiries@textileshop.co.uk
+                    {t("footer.linkTerms")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/privacy"
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {t("footer.linkPrivacy")}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3
+                className="text-sm font-medium mb-4 uppercase tracking-widest"
+                style={{ color: "#d3d3d3" }}
+              >
+                {t("footer.contact")}
+              </h3>
+              <ul className="space-y-2 text-sm" style={{ color: "#d3d3d3" }}>
+                <li>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {CONTACT_EMAIL}
                   </a>
                 </li>
+                <li>Beograd, Srbija</li>
+              </ul>
+              <h4
+                className="text-xs font-medium mt-6 mb-2 uppercase tracking-widest"
+                style={{ color: "rgba(211,211,211,0.7)" }}
+              >
+                {t("footer.legalTitle")}
+              </h4>
+              <ul
+                className="space-y-1 text-xs leading-relaxed"
+                style={{ color: "rgba(211,211,211,0.7)" }}
+              >
+                <li>{t("footer.legalName")}</li>
+                <li>{t("footer.legalMb")}</li>
+                <li>{t("footer.legalPib")}</li>
               </ul>
             </div>
           </div>
 
-          {/* Separator Line */}
           <div
             className="mt-12 pt-8 border-t"
             style={{ borderColor: "rgba(211, 211, 211, 0.2)" }}
           >
-            {/* Copyright */}
-            <div className="text-center text-sm" style={{ color: "#d3d3d3" }}>
-              <p>&copy; 2025 TEXTILE SHOP. ALL RIGHTS RESERVED.</p>
+            <div
+              className="text-center text-xs"
+              style={{ color: "rgba(211,211,211,0.7)" }}
+            >
+              <p>
+                © {year} NOOK · Anna Kovtun PR Beograd · {t("footer.rights")}
+              </p>
             </div>
           </div>
         </div>

@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Products() {
+  const { t } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
   const categoryParam = searchParams.get('category') || 'All'
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam)
@@ -23,29 +25,36 @@ export default function Products() {
       ? products
       : products.filter((p) => p.category === selectedCategory)
 
+  const labelFor = (cat: string) =>
+    t(`productFields.categories.${cat}`) || cat
+
   return (
     <div className="w-full bg-white">
-      {/* Header Section */}
       <section className="section-padding bg-white w-full">
         <div className="container-padding">
           <p className="text-sm md:text-base text-gray-400 uppercase tracking-widest mb-4 font-medium">
-            CURATED SELECTION
+            {t('products.eyebrow')}
           </p>
           <h1 className="heading-large mb-6" style={{ color: 'var(--foreground)' }}>
-            The Collection
+            {t('products.title')}
           </h1>
           <p className="text-base md:text-lg text-gray-500 leading-relaxed max-w-3xl">
-            Explore our carefully curated range of exceptional textiles, each selected for its unique character, superior quality, and enduring beauty.
+            {t('products.lead')}
           </p>
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <section className="py-6 border-y sticky top-20 z-40" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
+      <section
+        className="py-6 border-y sticky top-20 z-40"
+        style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+      >
         <div className="container-padding">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-500 font-medium">
-              SHOWING {filteredProducts.length} {filteredProducts.length === 1 ? 'ITEM' : 'ITEMS'}
+              {t('products.filterShowing')} {filteredProducts.length}{' '}
+              {filteredProducts.length === 1
+                ? t('common.item').toUpperCase()
+                : t('common.items').toUpperCase()}
             </div>
             <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
               {categories.map((category) => (
@@ -60,11 +69,13 @@ export default function Products() {
                     }
                   }}
                   className={`text-sm font-medium transition-all duration-300 px-2 pb-1 ${
-                    selectedCategory === category
-                      ? 'border-b-2'
-                      : ''
+                    selectedCategory === category ? 'border-b-2' : ''
                   }`}
-                  style={selectedCategory === category ? { color: 'var(--primary)', borderColor: 'var(--primary)' } : { color: 'var(--muted-foreground)' }}
+                  style={
+                    selectedCategory === category
+                      ? { color: 'var(--primary)', borderColor: 'var(--primary)' }
+                      : { color: 'var(--muted-foreground)' }
+                  }
                   onMouseEnter={(e) => {
                     if (selectedCategory !== category) {
                       e.currentTarget.style.color = 'var(--foreground)'
@@ -76,7 +87,7 @@ export default function Products() {
                     }
                   }}
                 >
-                  {category.toUpperCase()}
+                  {labelFor(category).toUpperCase()}
                 </button>
               ))}
             </div>
@@ -84,13 +95,19 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Products Grid Section */}
       <section className="w-full" style={{ backgroundColor: 'var(--card)' }}>
         {filteredProducts.length > 0 ? (
           <div className="container-padding py-8">
-            <div className="grid grid-cols-2 gap-0 border-t border-l" style={{ borderColor: 'var(--border)' }}>
+            <div
+              className="grid grid-cols-2 gap-0 border-t border-l"
+              style={{ borderColor: 'var(--border)' }}
+            >
               {filteredProducts.map((product, index) => (
-                <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
+                <div
+                  key={product.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -99,19 +116,24 @@ export default function Products() {
         ) : (
           <div className="text-center py-20 container-padding">
             <div className="max-w-md mx-auto">
-              <p className="text-gray-600 text-xl font-medium mb-4">No products found in this category.</p>
-              <p className="text-gray-500 mb-6">Try selecting a different category or view all products.</p>
+              <p className="text-gray-600 text-xl font-medium mb-4">
+                {t('products.emptyTitle')}
+              </p>
+              <p className="text-gray-500 mb-6">{t('products.emptyLead')}</p>
               <button
                 onClick={() => {
                   setSelectedCategory('All')
                   setSearchParams({})
                 }}
                 className="font-semibold py-3 px-8 transition-all duration-300 shadow-md hover:shadow-lg"
-                style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                style={{
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
               >
-                View All Products
+                {t('common.viewAllProducts')}
               </button>
             </div>
           </div>
@@ -120,6 +142,3 @@ export default function Products() {
     </div>
   )
 }
-
-
-
