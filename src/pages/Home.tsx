@@ -515,6 +515,22 @@ export default function Home() {
             >
               {t("home.storyText")}
             </p>
+            <div
+              className={`mt-10 flex justify-center transition-all duration-700 delay-300 ${
+                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              }`}
+            >
+              <Link
+                to="/about"
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-white"
+              >
+                <span className="relative">
+                  {t("home.storyCta")}
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
+                </span>
+                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

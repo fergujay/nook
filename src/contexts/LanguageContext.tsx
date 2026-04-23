@@ -97,6 +97,7 @@ const en: TranslationTree = {
     storyTitle: 'Home as a\nplace with meaning',
     storyText:
       'We believe that home is a place where every object has meaning. We design textiles that don’t overwhelm a space, but quietly become part of it.',
+    storyCta: 'ABOUT US',
     visitEyebrow: 'GET IN TOUCH',
     visitTitle: 'Say hello',
     visitText:
@@ -513,6 +514,7 @@ const sr: TranslationTree = {
     storyTitle: 'Dom kao\nmesto sa značenjem',
     storyText:
       'Verujemo da je dom mesto u kome svaki predmet ima značenje. Tekstili koje pravimo ne dominiraju prostorom — tiho postaju njegov deo.',
+    storyCta: 'O NAMA',
     visitEyebrow: 'KONTAKT',
     visitTitle: 'Javite nam se',
     visitText:
