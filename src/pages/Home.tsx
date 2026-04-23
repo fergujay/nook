@@ -313,128 +313,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Cotton */}
-      <section 
-        ref={cottonReveal.ref}
-        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
-      >
-        <div
-          className={`relative overflow-hidden transition-all duration-1000 select-none touch-pan-y ${
-            cottonSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
-          } ${
-            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
-          }`}
-          onMouseEnter={() => setIsCottonHovered(true)}
-          onMouseLeave={() => setIsCottonHovered(false)}
-          {...cottonSwipe.handlers}
-        >
-          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
-            {cottonImages.map((image, index) => (
-              <div
-                key={index}
-                className="absolute inset-0 transition-all duration-1000 ease-in-out"
-                style={{
-                  opacity: index === cottonSlideIndex ? 1 : 0,
-                  transform: index === cottonSlideIndex ? "scale(1)" : "scale(1.05)",
-                  zIndex: index === cottonSlideIndex ? 1 : 0,
-                }}
-              >
-                <img
-                  src={image}
-                  alt={`Pink coral tablecloth — view ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-            {/* Image slide indicators */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {cottonImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCottonSlideIndex(index)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === cottonSlideIndex 
-                      ? "w-6 bg-white" 
-                      : "w-2 bg-white/50 hover:bg-white/70"
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`flex flex-col justify-center relative bg-card transition-all duration-1000 delay-200 ${
-            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
-          }`}
-        >
-          <div className="container-padding py-16 lg:py-24">
-            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
-              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
-                {t("home.cottonEyebrow")}
-              </p>
-              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
-                {t("home.cottonTitle")}
-              </h2>
-              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
-                {t("home.cottonText")}
-              </p>
-              <Link
-                to="/products?category=Cotton"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
-              >
-                <span className="relative">
-                  {t("home.cottonCta")}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
-                </span>
-                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Linen */}
       <section 
         ref={linenReveal.ref}
         className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
       >
         <div
-          className={`flex flex-col justify-center order-2 lg:order-1 relative bg-card transition-all duration-1000 delay-200 ${
-            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
-          }`}
-        >
-          <div className="container-padding py-16 lg:py-24 relative z-10">
-            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:ml-auto lg:items-start lg:text-left">
-              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
-                {t("home.linenEyebrow")}
-              </p>
-              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
-                {t("home.linenTitle")}
-              </h2>
-              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
-                {t("home.linenText")}
-              </p>
-              <Link
-                to="/products?category=Linen"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
-              >
-                <span className="relative">
-                  {t("home.linenCta")}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
-                </span>
-                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 select-none touch-pan-y ${
+          className={`relative overflow-hidden transition-all duration-1000 select-none touch-pan-y ${
             linenSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
           } ${
-            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
           }`}
           onMouseEnter={() => setIsLinenHovered(true)}
           onMouseLeave={() => setIsLinenHovered(false)}
@@ -466,6 +354,118 @@ export default function Home() {
                   onClick={() => setLinenSlideIndex(index)}
                   className={`h-1 rounded-full transition-all duration-300 ${
                     index === linenSlideIndex 
+                      ? "w-6 bg-white" 
+                      : "w-2 bg-white/50 hover:bg-white/70"
+                  }`}
+                  aria-label={`View image ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`flex flex-col justify-center relative bg-card transition-all duration-1000 delay-200 ${
+            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+          }`}
+        >
+          <div className="container-padding py-16 lg:py-24">
+            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
+              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
+                {t("home.linenEyebrow")}
+              </p>
+              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
+                {t("home.linenTitle")}
+              </h2>
+              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
+                {t("home.linenText")}
+              </p>
+              <Link
+                to="/products?category=Linen"
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
+              >
+                <span className="relative">
+                  {t("home.linenCta")}
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
+                </span>
+                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cotton */}
+      <section 
+        ref={cottonReveal.ref}
+        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
+      >
+        <div
+          className={`flex flex-col justify-center order-2 lg:order-1 relative bg-card transition-all duration-1000 delay-200 ${
+            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
+          }`}
+        >
+          <div className="container-padding py-16 lg:py-24 relative z-10">
+            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:ml-auto lg:items-start lg:text-left">
+              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
+                {t("home.cottonEyebrow")}
+              </p>
+              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
+                {t("home.cottonTitle")}
+              </h2>
+              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
+                {t("home.cottonText")}
+              </p>
+              <Link
+                to="/products?category=Cotton"
+                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
+              >
+                <span className="relative">
+                  {t("home.cottonCta")}
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
+                </span>
+                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 select-none touch-pan-y ${
+            cottonSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
+          } ${
+            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+          }`}
+          onMouseEnter={() => setIsCottonHovered(true)}
+          onMouseLeave={() => setIsCottonHovered(false)}
+          {...cottonSwipe.handlers}
+        >
+          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
+            {cottonImages.map((image, index) => (
+              <div
+                key={index}
+                className="absolute inset-0 transition-all duration-1000 ease-in-out"
+                style={{
+                  opacity: index === cottonSlideIndex ? 1 : 0,
+                  transform: index === cottonSlideIndex ? "scale(1)" : "scale(1.05)",
+                  zIndex: index === cottonSlideIndex ? 1 : 0,
+                }}
+              >
+                <img
+                  src={image}
+                  alt={`Pink coral tablecloth — view ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+            {/* Image slide indicators */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {cottonImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCottonSlideIndex(index)}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    index === cottonSlideIndex 
                       ? "w-6 bg-white" 
                       : "w-2 bg-white/50 hover:bg-white/70"
                   }`}
