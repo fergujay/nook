@@ -9,17 +9,12 @@ type PaymentMethod = 'card' | 'cash_on_delivery' | 'at_pickup'
 
 const FREE_SHIPPING_THRESHOLD = 10000
 
-const STEPS = ['shipping', 'delivery', 'payment'] as const
-type Step = typeof STEPS[number]
-
 export default function Checkout() {
   const navigate = useNavigate()
   const { items, totalPrice, clearCart } = useCart()
   const { t, language } = useLanguage()
   const priceLocale = language === 'sr' ? 'sr-RS' : 'en-US'
   const [pageLoaded, setPageLoaded] = useState(false)
-  const [activeStep, setActiveStep] = useState<Step>('shipping')
-  const [completedSteps, setCompletedSteps] = useState<Set<Step>>(new Set())
 
   const [deliveryMethod, setDeliveryMethod] =
     useState<DeliveryMethod>('courier_belgrade')
@@ -91,26 +86,6 @@ export default function Checkout() {
 
   const formatRsd = (v: number) => `${v.toLocaleString(priceLocale)} RSD`
 
-  const stepLabels: Record<Step, string> = {
-    shipping: t('checkout.shippingInformation'),
-    delivery: t('checkout.deliveryMethod'),
-    payment: t('checkout.paymentMethod'),
-  }
-
-  const stepIcons: Record<Step, typeof MapPin> = {
-    shipping: MapPin,
-    delivery: Truck,
-    payment: CreditCard,
-  }
-
-  const markStepComplete = (step: Step) => {
-    setCompletedSteps(prev => new Set([...prev, step]))
-    const currentIndex = STEPS.indexOf(step)
-    if (currentIndex < STEPS.length - 1) {
-      setActiveStep(STEPS[currentIndex + 1])
-    }
-  }
-
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto container-padding py-16 min-h-[70vh] flex items-center justify-center">
@@ -148,58 +123,6 @@ export default function Checkout() {
         {t('checkout.title')}
       </h1>
 
-      {/* Progress Steps */}
-      <div 
-        className={`mb-10 transition-all duration-700 delay-100 ${
-          pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <div className="flex items-center justify-between max-w-2xl">
-          {STEPS.map((step, index) => {
-            const Icon = stepIcons[step]
-            const isActive = activeStep === step
-            const isCompleted = completedSteps.has(step)
-            
-            return (
-              <div key={step} className="flex items-center flex-1">
-                <button
-                  onClick={() => setActiveStep(step)}
-                  className={`flex items-center gap-3 transition-all duration-300 ${
-                    isActive ? 'scale-105' : ''
-                  }`}
-                >
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      isCompleted 
-                        ? 'bg-green-500 text-white' 
-                        : isActive 
-                          ? 'bg-primary text-primary-foreground shadow-md' 
-                          : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
-                  </div>
-                  <span 
-                    className={`hidden sm:block text-sm font-medium transition-colors ${
-                      isActive ? 'text-foreground' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {stepLabels[step]}
-                  </span>
-                </button>
-                {index < STEPS.length - 1 && (
-                  <div 
-                    className={`flex-1 h-0.5 mx-4 transition-colors duration-300 ${
-                      completedSteps.has(step) ? 'bg-green-500' : 'bg-border'
-                    }`}
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
@@ -208,35 +131,19 @@ export default function Checkout() {
           {/* Shipping Information */}
           <div 
             className={`bg-card border border-border rounded-xl p-6 transition-all duration-500 ${
-              activeStep === 'shipping' ? 'ring-2 ring-primary/20' : ''
-            } ${pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg ${completedSteps.has('shipping') ? 'bg-green-100' : 'bg-primary/10'}`}>
-                  {completedSteps.has('shipping') ? (
-                    <Check className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <MapPin className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-                <h2 className="text-xl font-semibold text-foreground">
-                  {t('checkout.shippingInformation')}
-                </h2>
+            <div className="mb-6 flex items-start gap-3 text-left">
+              <div className="shrink-0 rounded-lg bg-primary/10 p-2.5">
+                <MapPin className="h-5 w-5 text-primary" />
               </div>
-              {completedSteps.has('shipping') && activeStep !== 'shipping' && (
-                <button
-                  type="button"
-                  onClick={() => setActiveStep('shipping')}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Edit
-                </button>
-              )}
+              <h2 className="min-w-0 flex-1 text-left text-xl font-semibold text-foreground">
+                {t('checkout.shippingInformation')}
+              </h2>
             </div>
             
-            {activeStep === 'shipping' && (
-              <div className="space-y-4">
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
@@ -361,49 +268,25 @@ export default function Checkout() {
                     className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => markStepComplete('shipping')}
-                  className="btn-primary w-full sm:w-auto"
-                >
-                  Continue to Delivery
-                </button>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Delivery Method */}
           <div 
             className={`bg-card border border-border rounded-xl p-6 transition-all duration-500 delay-100 ${
-              activeStep === 'delivery' ? 'ring-2 ring-primary/20' : ''
-            } ${pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg ${completedSteps.has('delivery') ? 'bg-green-100' : 'bg-primary/10'}`}>
-                  {completedSteps.has('delivery') ? (
-                    <Check className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <Truck className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-                <h2 className="text-xl font-semibold text-foreground">
-                  {t('checkout.deliveryMethod')}
-                </h2>
+            <div className="mb-6 flex items-start gap-3 text-left">
+              <div className="shrink-0 rounded-lg bg-primary/10 p-2.5">
+                <Truck className="h-5 w-5 text-primary" />
               </div>
-              {completedSteps.has('delivery') && activeStep !== 'delivery' && (
-                <button
-                  type="button"
-                  onClick={() => setActiveStep('delivery')}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Edit
-                </button>
-              )}
+              <h2 className="min-w-0 flex-1 text-left text-xl font-semibold text-foreground">
+                {t('checkout.deliveryMethod')}
+              </h2>
             </div>
             
-            {(activeStep === 'delivery' || completedSteps.has('shipping')) && (
-              <div className="space-y-3">
+            <div className="space-y-3">
                 {(
                   [
                     {
@@ -458,37 +341,25 @@ export default function Checkout() {
                     )}
                   </label>
                 ))}
-                {activeStep === 'delivery' && (
-                  <button
-                    type="button"
-                    onClick={() => markStepComplete('delivery')}
-                    className="btn-primary w-full sm:w-auto mt-4"
-                  >
-                    Continue to Payment
-                  </button>
-                )}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Payment Method */}
           <div 
             className={`bg-card border border-border rounded-xl p-6 transition-all duration-500 delay-200 ${
-              activeStep === 'payment' ? 'ring-2 ring-primary/20' : ''
-            } ${pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              pageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className={`p-2.5 rounded-lg ${completedSteps.has('payment') ? 'bg-green-100' : 'bg-primary/10'}`}>
+            <div className="mb-6 flex items-start gap-3 text-left">
+              <div className="shrink-0 rounded-lg bg-primary/10 p-2.5">
                 <CreditCard className="h-5 w-5 text-primary" />
               </div>
-              <h2 className="text-xl font-semibold text-foreground">
+              <h2 className="min-w-0 flex-1 text-left text-xl font-semibold text-foreground">
                 {t('checkout.paymentMethod')}
               </h2>
             </div>
             
-            {(activeStep === 'payment' || completedSteps.has('delivery')) && (
-              <>
-                <div className="space-y-3 mb-4">
+            <div className="mb-4 space-y-3">
                   {paymentOptions.map((opt) => (
                     <label
                       key={opt.id}
@@ -574,8 +445,6 @@ export default function Checkout() {
                     </div>
                   </div>
                 )}
-              </>
-            )}
           </div>
         </div>
 

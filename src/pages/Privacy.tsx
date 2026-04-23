@@ -24,7 +24,9 @@ export default function Privacy() {
   return (
     <div className="max-w-4xl mx-auto container-padding py-16">
       <div className="mb-12">
-        <h1 className="heading-medium mb-6">{t("privacy.title")}</h1>
+        <h1 className="heading-medium font-serif tracking-[-0.02em] mb-6 text-foreground">
+          {t("privacy.title")}
+        </h1>
         <p className="text-lg text-gray-600 leading-relaxed">
           {t("privacy.intro")}
         </p>
@@ -32,7 +34,7 @@ export default function Privacy() {
 
       <div className="prose prose-lg max-w-none space-y-10 text-gray-700">
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.dataCollectTitle")}
           </h2>
           <p className="leading-relaxed mb-3">
@@ -49,7 +51,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.dataUseTitle")}
           </h2>
           <p className="leading-relaxed mb-3">{t("privacy.dataUseIntro")}</p>
@@ -65,14 +67,14 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.marketingTitle")}
           </h2>
           <p className="leading-relaxed">{t("privacy.marketingText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.sharingTitle")}
           </h2>
           <p className="leading-relaxed mb-3">{t("privacy.sharingIntro")}</p>
@@ -90,14 +92,14 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.storageTitle")}
           </h2>
           <p className="leading-relaxed">{t("privacy.storageText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.rightsTitle")}
           </h2>
           <p className="leading-relaxed mb-3">{t("privacy.rightsIntro")}</p>
@@ -115,14 +117,14 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.cookiesTitle")}
           </h2>
           <p className="leading-relaxed">{t("privacy.cookiesText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("privacy.contactTitle")}
           </h2>
           <p className="leading-relaxed">

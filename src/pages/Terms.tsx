@@ -24,7 +24,9 @@ export default function Terms() {
   return (
     <div className="max-w-4xl mx-auto container-padding py-16">
       <div className="mb-12">
-        <h1 className="heading-medium mb-6">{t("terms.title")}</h1>
+        <h1 className="heading-medium font-serif tracking-[-0.02em] mb-6 text-foreground">
+          {t("terms.title")}
+        </h1>
         <p className="text-lg text-gray-600 leading-relaxed">
           {t("terms.intro")}
         </p>
@@ -32,21 +34,21 @@ export default function Terms() {
 
       <div className="prose prose-lg max-w-none space-y-10 text-gray-700">
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.ordersTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.ordersText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.pricingTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.pricingText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.paymentTitle")}
           </h2>
           <p className="leading-relaxed mb-3">{t("terms.paymentIntro")}</p>
@@ -62,42 +64,42 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.deliveryTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.deliveryText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.returnsTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.returnsText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.productTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.productText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.liabilityTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.liabilityText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.changesTitle")}
           </h2>
           <p className="leading-relaxed">{t("terms.changesText")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium mb-3">
+          <h2 className="font-serif text-2xl font-medium tracking-[-0.02em] mb-3 text-foreground">
             {t("terms.contactTitle")}
           </h2>
           <p className="leading-relaxed">

@@ -50,7 +50,7 @@ export default function Products() {
             {t('products.eyebrow')}
           </p>
           <h1 
-            className={`heading-large mb-6 text-foreground text-balance transition-all duration-700 delay-100 ${
+            className={`heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance transition-all duration-700 delay-100 ${
               headerRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
@@ -68,11 +68,11 @@ export default function Products() {
 
       {/* Filter Bar */}
       <section
-        className="py-5 border-y sticky top-16 z-40 bg-card/95 backdrop-blur-md border-border transition-shadow duration-300"
+        className="py-5 border-y sticky top-16 z-40 bg-white border-border shadow-soft"
       >
         <div className="container-padding max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-muted-foreground font-medium flex items-center gap-2">
+            <div className="text-sm text-foreground font-medium flex items-center gap-2">
               <span className="uppercase tracking-wide">{t('products.filterShowing')}</span>
               <span className="inline-flex items-center justify-center min-w-[2rem] h-7 px-2 bg-primary/10 text-primary font-semibold rounded-full">
                 {filteredProducts.length}
@@ -100,7 +100,7 @@ export default function Products() {
                   className={`text-sm font-medium transition-all duration-300 px-4 py-2 rounded-full border ${
                     selectedCategory === category
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
-                      : 'bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground hover:bg-muted/50'
+                      : 'bg-white text-foreground border-foreground/30 hover:border-primary hover:text-primary hover:bg-primary/5'
                   }`}
                   style={{ 
                     animationDelay: `${index * 50}ms`,

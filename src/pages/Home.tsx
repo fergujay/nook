@@ -22,6 +22,54 @@ const HERO_IMAGES = [
   "/slider/hero-slider-12.jpg",
 ];
 
+// Swipe/drag hook that works for touch and mouse.
+// Returns handlers to spread onto the draggable element and whether we are actively dragging.
+function useSwipe(onNext: () => void, onPrev: () => void) {
+  const startRef = useRef<{ x: number; y: number; id: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLElement>) => {
+    // Ignore right/middle clicks
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    startRef.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (!startRef.current || startRef.current.id !== e.pointerId) return;
+    const dx = e.clientX - startRef.current.x;
+    const dy = e.clientY - startRef.current.y;
+    // Once clearly horizontal, mark as dragging so we can change cursor & suppress clicks
+    if (!isDragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+      setIsDragging(true);
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    }
+  };
+
+  const finish = (e: React.PointerEvent<HTMLElement>) => {
+    if (!startRef.current || startRef.current.id !== e.pointerId) return;
+    const dx = e.clientX - startRef.current.x;
+    const dy = e.clientY - startRef.current.y;
+    startRef.current = null;
+    setIsDragging(false);
+    const threshold = 50;
+    if (Math.abs(dx) <= Math.abs(dy)) return; // vertical intent → leave as scroll
+    if (dx < -threshold) onNext();
+    else if (dx > threshold) onPrev();
+  };
+
+  return {
+    isDragging,
+    handlers: {
+      onPointerDown,
+      onPointerMove,
+      onPointerUp: finish,
+      onPointerCancel: finish,
+      // Prevent native image-drag from hijacking the gesture on desktop
+      onDragStart: (e: React.DragEvent) => e.preventDefault(),
+    },
+  };
+}
+
 // Custom hook for scroll-triggered reveals
 function useRevealOnScroll(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -74,6 +122,19 @@ export default function Home() {
   const linenImages =
     linenProduct?.gallery || [linenProduct?.image || ""].filter(Boolean);
 
+  const heroSwipe = useSwipe(
+    () => setHeroSlideIndex((i) => (i + 1) % HERO_IMAGES.length),
+    () => setHeroSlideIndex((i) => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length),
+  );
+  const cottonSwipe = useSwipe(
+    () => setCottonSlideIndex((i) => (i + 1) % Math.max(cottonImages.length, 1)),
+    () => setCottonSlideIndex((i) => (i - 1 + cottonImages.length) % Math.max(cottonImages.length, 1)),
+  );
+  const linenSwipe = useSwipe(
+    () => setLinenSlideIndex((i) => (i + 1) % Math.max(linenImages.length, 1)),
+    () => setLinenSlideIndex((i) => (i - 1 + linenImages.length) % Math.max(linenImages.length, 1)),
+  );
+
   const handleScroll = useCallback(() => {
     setScrollY(window.scrollY);
   }, []);
@@ -118,9 +179,12 @@ export default function Home() {
       {/* Hero Section */}
       <section
         ref={heroImageRef}
-        className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden"
+        className={`relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden select-none touch-pan-y ${
+          heroSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
+        }`}
         onMouseEnter={() => setIsHeroHovered(true)}
         onMouseLeave={() => setIsHeroHovered(false)}
+        {...heroSwipe.handlers}
       >
         <div
           className="absolute inset-0"
@@ -168,14 +232,14 @@ export default function Home() {
 
         <div className="relative z-10 container-padding text-center max-w-4xl">
           <p 
-            className={`text-sm md:text-base uppercase tracking-[0.3em] mb-6 font-medium text-white/90 transition-all duration-700 ${
+            className={`section-subtitle text-[0.65rem] font-semibold uppercase tracking-[0.32em] mb-6 text-white/90 sm:text-xs transition-all duration-700 ${
               heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
             {t("home.heroEyebrow")}
           </p>
           <h1 
-            className={`heading-large mb-8 leading-tight text-white text-balance transition-all duration-700 delay-150 ${
+            className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] text-white text-balance transition-all duration-700 delay-150 ${
               heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -232,7 +296,7 @@ export default function Home() {
             {t("home.collectionEyebrow")}
           </p>
           <h2
-            className={`heading-large mb-8 text-foreground text-balance transition-all duration-700 delay-100 ${
+            className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] text-foreground text-balance transition-all duration-700 delay-100 ${
               collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
@@ -254,11 +318,14 @@ export default function Home() {
         className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
       >
         <div
-          className={`relative overflow-hidden transition-all duration-1000 ${
+          className={`relative overflow-hidden transition-all duration-1000 select-none touch-pan-y ${
+            cottonSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
+          } ${
             cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
           }`}
           onMouseEnter={() => setIsCottonHovered(true)}
           onMouseLeave={() => setIsCottonHovered(false)}
+          {...cottonSwipe.handlers}
         >
           <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
             {cottonImages.map((image, index) => (
@@ -302,11 +369,11 @@ export default function Home() {
           }`}
         >
           <div className="container-padding py-16 lg:py-24">
-            <div className="max-w-lg text-center lg:text-left">
+            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
               <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
                 {t("home.cottonEyebrow")}
               </p>
-              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
+              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
                 {t("home.cottonTitle")}
               </h2>
               <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
@@ -338,11 +405,11 @@ export default function Home() {
           }`}
         >
           <div className="container-padding py-16 lg:py-24 relative z-10">
-            <div className="max-w-lg text-center lg:text-left lg:ml-auto">
+            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:ml-auto lg:items-start lg:text-left">
               <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
                 {t("home.linenEyebrow")}
               </p>
-              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
+              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
                 {t("home.linenTitle")}
               </h2>
               <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
@@ -363,11 +430,14 @@ export default function Home() {
         </div>
 
         <div
-          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 ${
+          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 select-none touch-pan-y ${
+            linenSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
+          } ${
             linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
           }`}
           onMouseEnter={() => setIsLinenHovered(true)}
           onMouseLeave={() => setIsLinenHovered(false)}
+          {...linenSwipe.handlers}
         >
           <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
             {linenImages.map((image, index) => (
@@ -431,7 +501,7 @@ export default function Home() {
               {t("home.storyEyebrow")}
             </p>
             <h2
-              className={`heading-large mb-8 leading-tight whitespace-pre-line text-white text-balance transition-all duration-700 delay-100 ${
+              className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] whitespace-pre-line text-balance text-white transition-all duration-700 delay-100 ${
                 storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
@@ -488,7 +558,7 @@ export default function Home() {
               <p className="text-sm md:text-base text-muted-foreground uppercase tracking-[0.25em] mb-4 font-medium">
                 {t("home.visitEyebrow")}
               </p>
-              <h2 className="heading-large mb-6 leading-tight text-foreground text-balance">
+              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
                 {t("home.visitTitle")}
               </h2>
               <p className="text-base md:text-lg text-muted-foreground mb-12 leading-relaxed">
@@ -533,7 +603,7 @@ export default function Home() {
                       <item.icon className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                      <h3 className="font-editorial text-lg font-semibold text-foreground mb-2">
                         {item.title}
                       </h3>
                       {item.content}

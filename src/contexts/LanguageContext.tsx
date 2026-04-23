@@ -23,7 +23,6 @@ const en: TranslationTree = {
     aboutUs: 'About',
     textileCare: 'Textile Care',
     courier: 'Delivery & Payment',
-    favorites: 'Favorites',
     cart: 'Cart',
   },
   common: {
@@ -35,8 +34,8 @@ const en: TranslationTree = {
     addToCart: 'Add to Cart',
     addedToCart: 'Added to cart',
     viewProduct: 'View Details',
+    enlarge: 'Enlarge',
     outOfStock: 'Out of Stock',
-    inStock: 'In stock',
     quantity: 'Quantity',
     item: 'item',
     items: 'items',
@@ -54,6 +53,9 @@ const en: TranslationTree = {
   productFields: {
     tablecloth: 'Tablecloth',
     napkinsSet: 'Napkins, set of two',
+    placematsRoundSet: 'Round placemats, set of two',
+    placematsEmbroideredSet: 'Embroidered placemats, set of two',
+    stripedTableRunner: 'Striped table runner',
     tableRunner: 'Table runner',
     round: 'round',
     rectangular: 'rectangular',
@@ -70,7 +72,7 @@ const en: TranslationTree = {
   },
   home: {
     heroEyebrow: 'TABLE LINEN · BELGRADE',
-    heroTitle: 'Textiles that quietly become part of your home',
+    heroTitle: 'Textiles that feel like home',
     heroLead:
       'NOOK is a small table linen brand based in Belgrade. We create our pieces in small batches using natural fabrics, paying close attention to every detail.',
     heroCta: 'VIEW COLLECTION',
@@ -98,7 +100,7 @@ const en: TranslationTree = {
     visitEyebrow: 'GET IN TOUCH',
     visitTitle: 'Say hello',
     visitText:
-      'Questions, custom pieces, or a quiet chat about linen — we’d love to hear from you.',
+      'Questions, custom pieces, or a chat about linen — we’d love to hear from you.',
     locationTitle: 'Based in',
     locationText: 'Belgrade, Serbia',
     pickupTitle: 'Pickup partner',
@@ -107,7 +109,7 @@ const en: TranslationTree = {
   },
   products: {
     eyebrow: 'THE COLLECTION',
-    title: 'Table linen, made in small batches',
+    title: 'Find your table’s new favorite',
     lead:
       'Each piece is designed and sewn in Belgrade, using natural fabrics. Stocks are intentionally limited — if something is gone, it may return in the next batch.',
     filterShowing: 'SHOWING',
@@ -116,6 +118,11 @@ const en: TranslationTree = {
   },
   productDetail: {
     recommended: 'You might also like',
+    backToShop: 'Back to shop',
+    lightboxZoomIn: 'Zoom in',
+    lightboxZoomOut: 'Zoom out',
+    lightboxZoomControls: 'Image zoom',
+    lightboxClose: 'Close gallery',
   },
   cart: {
     title: 'Shopping Cart',
@@ -129,6 +136,8 @@ const en: TranslationTree = {
     subtotal: 'Subtotal',
     proceedToCheckout: 'Proceed to Checkout',
     remove: 'Remove',
+    decreaseQuantity: 'Decrease quantity',
+    increaseQuantity: 'Increase quantity',
     freeShippingNote: 'Free delivery on orders over 10 000 RSD',
   },
   checkout: {
@@ -169,9 +178,12 @@ const en: TranslationTree = {
     and: 'and',
   },
   order: {
+    heroEyebrow: 'ORDER · CONFIRMED',
     confirmed: 'Order received!',
     thankYou:
       'Thank you for your order. We’ll be in touch shortly by email to confirm details and delivery.',
+    detailsLead:
+      'Save this reference — we’ll use it in your confirmation email and when your order ships.',
     orderDetails: 'Order Details',
     orderNumber: 'Order Number',
     orderDate: 'Order Date',
@@ -181,15 +193,9 @@ const en: TranslationTree = {
       'You will receive a confirmation email with order details and tracking information once your order ships.',
     backToHome: 'Back to Home',
   },
-  favorites: {
-    title: 'My Favorites',
-    empty: 'Your favorites list is empty',
-    emptyHint: 'Start adding pieces you love',
-    removeFromFavorites: 'Remove from favorites',
-    addToFavorites: 'Add to favorites',
-  },
   about: {
     title: 'About NOOK',
+    storySectionLabel: 'On cloth and home',
     lead: 'A small table linen brand based in Belgrade.',
     p1:
       'We create our pieces in small batches using natural fabrics, allowing us to pay close attention to every detail. What matters to us is not only how an item looks, but how it lives – after washing, in everyday use, and in different homes.',
@@ -211,6 +217,9 @@ const en: TranslationTree = {
   },
   courier: {
     title: 'Delivery & Payment',
+    heroEyebrow: 'SHIPPING · SERBIA',
+    optionsTitle: 'How we deliver',
+    detailsTitle: 'Terms & payment',
     lead: 'We offer delivery within Serbia.',
     optionBelgradeTitle: 'Courier delivery (Belgrade)',
     optionBelgradePrice: '500 RSD',
@@ -241,6 +250,8 @@ const en: TranslationTree = {
   },
   textileCare: {
     title: 'How to care for your textiles',
+    heroEyebrow: 'LINEN & COTTON · CARE',
+    stepsTitle: 'A gentle routine',
     lead:
       'Linen and cotton get better with use. A few simple habits will keep your table linen looking quietly beautiful for years.',
     sections: {
@@ -290,6 +301,7 @@ const en: TranslationTree = {
     ],
   },
   returns: {
+    heroEyebrow: 'CUSTOMER CARE',
     title: 'Returns & Refunds',
     lead:
       'If for any reason you are not satisfied with your order, you have the right to return it within 14 days of delivery.',
@@ -427,7 +439,6 @@ const sr: TranslationTree = {
     aboutUs: 'O nama',
     textileCare: 'Nega tekstila',
     courier: 'Dostava i plaćanje',
-    favorites: 'Omiljeno',
     cart: 'Korpa',
   },
   common: {
@@ -439,8 +450,8 @@ const sr: TranslationTree = {
     addToCart: 'Dodaj u korpu',
     addedToCart: 'Dodato u korpu',
     viewProduct: 'Pogledaj detalje',
+    enlarge: 'Uvećaj',
     outOfStock: 'Nije na stanju',
-    inStock: 'Na stanju',
     quantity: 'Količina',
     item: 'artikal',
     items: 'artikli',
@@ -458,6 +469,9 @@ const sr: TranslationTree = {
   productFields: {
     tablecloth: 'Stolnjak',
     napkinsSet: 'Salvete, set od dva',
+    placematsRoundSet: 'Okrugli plejsmeti, set od dva',
+    placematsEmbroideredSet: 'Plejsmeti sa vezom, set od dva',
+    stripedTableRunner: 'Prugasti ranner za sto',
     tableRunner: 'Ranner za sto',
     round: 'okrugli',
     rectangular: 'pravougaoni',
@@ -474,7 +488,7 @@ const sr: TranslationTree = {
   },
   home: {
     heroEyebrow: 'STOLNI TEKSTIL · BEOGRAD',
-    heroTitle: 'Tekstil koji tiho postaje deo vašeg doma',
+    heroTitle: 'Tekstili koji deluju kao kod kuće',
     heroLead:
       'NOOK je mali brend stolnog tekstila iz Beograda. Šijemo u malim serijama, od prirodnih materijala, posvećeni svakom detalju.',
     heroCta: 'POGLEDAJ KOLEKCIJU',
@@ -511,7 +525,7 @@ const sr: TranslationTree = {
   },
   products: {
     eyebrow: 'KOLEKCIJA',
-    title: 'Stolni tekstil u malim serijama',
+    title: 'Pronađite novi omiljeni komad za sto',
     lead:
       'Svaki komad je dizajniran i šiven u Beogradu, od prirodnih materijala. Zalihe su namerno male — ako nečega nema, moguće je da se vrati u sledećoj seriji.',
     filterShowing: 'PRIKAZANO',
@@ -520,6 +534,11 @@ const sr: TranslationTree = {
   },
   productDetail: {
     recommended: 'Možda će vam se dopasti i ovo',
+    backToShop: 'Nazad u prodavnicu',
+    lightboxZoomIn: 'Uvećaj',
+    lightboxZoomOut: 'Umanji',
+    lightboxZoomControls: 'Uvećanje slike',
+    lightboxClose: 'Zatvori galeriju',
   },
   cart: {
     title: 'Korpa',
@@ -533,6 +552,8 @@ const sr: TranslationTree = {
     subtotal: 'Međuzbir',
     proceedToCheckout: 'Napred ka naplati',
     remove: 'Ukloni',
+    decreaseQuantity: 'Smanji količinu',
+    increaseQuantity: 'Povećaj količinu',
     freeShippingNote: 'Besplatna dostava za porudžbine preko 10 000 RSD',
   },
   checkout: {
@@ -573,9 +594,12 @@ const sr: TranslationTree = {
     and: 'i',
   },
   order: {
+    heroEyebrow: 'PORUDŽBINA · PRIMLJENA',
     confirmed: 'Porudžbina je primljena!',
     thankYou:
       'Hvala na porudžbini. Javljamo se uskoro putem e-maila da potvrdimo detalje i dostavu.',
+    detailsLead:
+      'Sačuvajte ovaj broj — koristićemo ga u mejlu za potvrdu i kada pošaljemo porudžbinu.',
     orderDetails: 'Detalji porudžbine',
     orderNumber: 'Broj porudžbine',
     orderDate: 'Datum',
@@ -585,15 +609,9 @@ const sr: TranslationTree = {
       'Dobićete e-mail sa potvrdom i detaljima porudžbine. Kada se pošalje, šaljemo i informacije za praćenje.',
     backToHome: 'Nazad na početnu',
   },
-  favorites: {
-    title: 'Omiljeno',
-    empty: 'Vaša lista omiljenih je prazna',
-    emptyHint: 'Sačuvajte komade koji vam se dopadaju',
-    removeFromFavorites: 'Ukloni iz omiljenih',
-    addToFavorites: 'Dodaj u omiljeno',
-  },
   about: {
     title: 'O NOOK-u',
+    storySectionLabel: 'O tekstilu i domu',
     lead: 'Mali brend stolnog tekstila iz Beograda.',
     p1:
       'Naše komade pravimo u malim serijama, od prirodnih materijala, što nam omogućava da svakom detalju posvetimo pažnju. Nije nam važno samo kako komad izgleda, već i kako živi — nakon pranja, u svakodnevnoj upotrebi, u različitim domovima.',
@@ -615,6 +633,9 @@ const sr: TranslationTree = {
   },
   courier: {
     title: 'Dostava i plaćanje',
+    heroEyebrow: 'DOSTAVA · SRBIJA',
+    optionsTitle: 'Načini dostave',
+    detailsTitle: 'Uslovi i plaćanje',
     lead: 'Dostavljamo u celoj Srbiji.',
     optionBelgradeTitle: 'Kurirska dostava (Beograd)',
     optionBelgradePrice: '500 RSD',
@@ -645,6 +666,8 @@ const sr: TranslationTree = {
   },
   textileCare: {
     title: 'Kako brinuti o tekstilu',
+    heroEyebrow: 'LAN I PAMUK · NEGA',
+    stepsTitle: 'Blaga rutina',
     lead:
       'Lan i pamuk sa upotrebom postaju sve lepši. Nekoliko jednostavnih navika čuva vaš stolni tekstil godinama.',
     sections: {
@@ -694,6 +717,7 @@ const sr: TranslationTree = {
     ],
   },
   returns: {
+    heroEyebrow: 'POVRATI',
     title: 'Povraćaj i refundacija',
     lead:
       'Ukoliko iz bilo kog razloga niste zadovoljni porudžbinom, imate pravo da je vratite u roku od 14 dana od prijema.',

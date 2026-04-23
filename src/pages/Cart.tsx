@@ -104,7 +104,7 @@ export default function Cart() {
                 <div>
                   <Link 
                     to={`/products/${item.id}`}
-                    className="font-semibold text-lg text-foreground hover:text-primary transition-colors line-clamp-2"
+                    className="font-editorial font-semibold text-lg text-foreground hover:text-primary transition-colors line-clamp-2"
                   >
                     {item.name}
                   </Link>
@@ -117,7 +117,7 @@ export default function Cart() {
                 <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
                   <div className="flex items-center gap-3">
                     {/* Quantity Selector */}
-                    <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                    <div className="flex items-center border border-border rounded-none overflow-hidden">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="p-2.5 hover:bg-muted transition-colors text-foreground"

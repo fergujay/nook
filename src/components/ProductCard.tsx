@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { ShoppingCart, Heart, Eye } from 'lucide-react'
+import { ShoppingCart, Eye } from 'lucide-react'
 import { useState } from 'react'
 import { Product } from '../data/products'
+import { formatProductDisplaySize } from '../utils/productSize'
 import { useCart } from '../contexts/CartContext'
-import { useFavorites } from '../contexts/FavoritesContext'
 import { useLanguage } from '../contexts/LanguageContext'
 
 interface ProductCardProps {
@@ -13,7 +13,6 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart } = useCart()
-  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites()
   const { t, language } = useLanguage()
   const [isHovered, setIsHovered] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -33,27 +32,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     setTimeout(() => setAddedToCart(false), 1500)
   }
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (isFavorite(product.id)) {
-      removeFromFavorites(product.id)
-    } else {
-      addToFavorites({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-      })
-    }
-  }
-
   const description = product.descriptionKey ? t(product.descriptionKey) : product.description
   const fabric = product.fabricKey ? t(product.fabricKey) : product.fabric
   const shape = product.shapeKey ? t(product.shapeKey) : product.shape
+  const displaySize = formatProductDisplaySize(product)
   const categoryLabel = t(`productFields.categories.${product.category}`) || product.category
   const priceLocale = language === 'sr' ? 'sr-RS' : 'en-US'
-  const favored = isFavorite(product.id)
 
   return (
     <div
@@ -96,14 +80,14 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
           )}
 
-          {/* Quick view button on hover */}
+          {/* Quick view — inset matches category (top-3 left-3) and cart (top-3 right-3): 12px edges */}
           <div 
-            className={`absolute inset-x-0 bottom-0 p-4 flex justify-center transition-all duration-300 ${
+            className={`absolute bottom-3 left-3 right-3 flex justify-center transition-all duration-300 ${
               isHovered && product.inStock ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/95 text-foreground text-sm font-medium shadow-md backdrop-blur-sm">
-              <Eye className="h-4 w-4" />
+            <span className="inline-flex items-center gap-2 border border-border bg-white/95 px-4 py-2 text-sm font-medium text-muted-foreground shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-primary hover:text-primary hover:shadow-lg active:scale-95">
+              <Eye className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
               {t('common.viewProduct')}
             </span>
           </div>
@@ -120,7 +104,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         <div className="p-5 flex flex-col justify-between flex-grow">
           <div>
             <h3
-              className={`text-lg md:text-xl font-medium mb-2 leading-tight transition-colors duration-300 ${
+              className={`font-editorial text-lg font-medium leading-tight tracking-[-0.02em] transition-colors duration-300 md:text-xl mb-2 ${
                 isHovered ? 'text-primary' : 'text-foreground'
               }`}
             >
@@ -137,12 +121,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 {product.price.toLocaleString(priceLocale)} RSD
               </span>
             </div>
-            {(product.size || fabric) && (
+            {(displaySize || fabric) && (
               <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                {product.size && (
+                {displaySize && (
                   <span>
-                    {product.size}
-                    {shape ? ` (${shape})` : ''}
+                    {displaySize}
+                    {shape && product.shape !== 'round' ? ` (${shape})` : ''}
                   </span>
                 )}
                 {fabric && (
@@ -163,35 +147,21 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         }`}
       >
-        <button
-          onClick={handleToggleFavorite}
-          className={`p-2.5 bg-white/95 backdrop-blur-sm transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-110 active:scale-95 ${
-            favored 
-              ? 'text-primary border-2 border-primary' 
-              : 'text-muted-foreground border border-border hover:text-primary hover:border-primary'
-          }`}
-          aria-label={favored ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          <Heart 
-            className={`h-4 w-4 transition-transform duration-300 ${favored ? 'scale-110' : ''}`} 
-            fill={favored ? 'currentColor' : 'none'} 
-          />
-        </button>
-        
         {product.inStock && (
           <button
+            type="button"
             onClick={handleAddToCart}
-            className={`p-2.5 backdrop-blur-sm transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-110 active:scale-95 ${
-              addedToCart 
-                ? 'bg-primary text-primary-foreground border-2 border-primary' 
-                : 'bg-white/95 text-muted-foreground border border-border hover:text-primary hover:border-primary'
+            className={`inline-flex shrink-0 items-center justify-center rounded-none border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all duration-300 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 ${
+              addedToCart
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-white/95 text-muted-foreground hover:border-primary hover:text-primary'
             }`}
             aria-label={t('common.addToCart')}
             onMouseDown={(e) => e.preventDefault()}
           >
-            <ShoppingCart 
-              className={`h-4 w-4 transition-transform duration-300 ${addedToCart ? 'scale-110' : ''}`} 
+            <ShoppingCart
+              className={`h-4 w-4 transition-transform duration-300 ${addedToCart ? 'scale-110' : ''}`}
+              strokeWidth={2}
             />
           </button>
         )}
