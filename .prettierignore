@@ -2,6 +2,7 @@ node_modules
 dist
 coverage
 playwright-report
+playwright-artifacts
 test-results
 .vercel
 yarn.lock

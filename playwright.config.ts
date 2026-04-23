@@ -6,6 +6,8 @@ const isCI = !!process.env.CI
 
 export default defineConfig({
   testDir: './e2e',
+  /** Failure screenshots, traces, and retain-on-failure videos all go here (separate from source). */
+  outputDir: 'playwright-artifacts',
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,

@@ -8,6 +8,7 @@ dist
 *.log
 coverage
 playwright-report
+playwright-artifacts
 test-results
 e2e
 scripts/optimize-assets.sh

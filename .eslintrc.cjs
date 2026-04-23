@@ -18,6 +18,7 @@ module.exports = {
     'node_modules',
     'coverage',
     'playwright-report',
+    'playwright-artifacts',
     'test-results',
     '*.config.js',
     '*.config.ts',

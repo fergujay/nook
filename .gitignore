@@ -39,6 +39,7 @@ dist-ssr
 # Testing
 coverage
 playwright-report
+playwright-artifacts
 test-results
 .vitest
 blob-report

@@ -1,4 +1,4 @@
-import { Mail, MapPin, Scissors, Leaf, Home } from "lucide-react";
+import { Mail, Instagram, Scissors, Leaf, Home } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { getAssetPath } from "../utils/images";
@@ -6,6 +6,7 @@ import { EditorialInfoHero } from "../components/EditorialInfoHero";
 import { EditorialSectionKicker } from "../components/EditorialSectionKicker";
 
 const CONTACT_EMAIL = "nook.textile@gmail.com";
+const INSTAGRAM_URL = "https://www.instagram.com/nook.belgrade/";
 
 const ABOUT_IMAGES = {
   hero: getAssetPath("/slider/hero-slider-05.jpg"),
@@ -243,12 +244,19 @@ export default function About() {
               </div>
             </div>
             <div className="flex gap-5 md:pl-8">
-              <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary/90" aria-hidden />
+              <Instagram className="mt-0.5 h-5 w-5 shrink-0 text-primary/90" aria-hidden />
               <div>
                 <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
                   {t("about.basedIn")}
                 </p>
-                <p className="text-pretty text-base text-foreground">{t("about.basedInValue")}</p>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-pretty text-base text-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary/40"
+                >
+                  {t("about.basedInValue")}
+                </a>
               </div>
             </div>
           </div>

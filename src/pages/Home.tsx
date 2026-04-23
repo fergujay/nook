@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, Mail, MessageCircle } from "lucide-react";
+import { ArrowRight, Instagram, Mail, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
 import { useLanguage } from "../contexts/LanguageContext";
 
 const CONTACT_EMAIL = "nook.textile@gmail.com";
+const INSTAGRAM_URL = "https://www.instagram.com/nook.belgrade/";
 
 const HERO_IMAGES = [
   "/slider/hero-slider-01.jpg",
@@ -581,9 +582,18 @@ export default function Home() {
                     delay: "delay-100",
                   },
                   {
-                    icon: MapPin,
+                    icon: Instagram,
                     title: t("home.locationTitle"),
-                    content: <p className="text-muted-foreground leading-relaxed">{t("home.locationText")}</p>,
+                    content: (
+                      <a
+                        href={INSTAGRAM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                      >
+                        {t("home.locationText")}
+                      </a>
+                    ),
                     delay: "delay-200",
                   },
                   {

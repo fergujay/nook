@@ -47,7 +47,7 @@ test(home): cover parallax hero image with e2e smoke test
 
 - `.env`, `.env.local`, `.env.*.local`
 - Anything containing `BLOB_READ_WRITE_TOKEN` or other secrets
-- `dist/`, `coverage/`, `playwright-report/`, `test-results/`, `.vercel/`
+- `dist/`, `coverage/`, `playwright-report/`, `playwright-artifacts/`, `test-results/`, `.vercel/`
 
 If `git status` shows any of these as staged, abort and ask.
 

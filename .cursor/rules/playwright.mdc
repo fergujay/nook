@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Playwright E2E
 
-- Config: `playwright.config.ts`. It automatically runs `yarn preview` on port 4173 unless `E2E_BASE_URL` is set (so you can point tests at a Vercel preview deployment).
+- Config: `playwright.config.ts`. It automatically runs `yarn preview` on port 4173 unless `E2E_BASE_URL` is set (so you can point tests at a Vercel preview deployment). Failure artifacts (screenshots, traces, videos) are written under `playwright-artifacts/` (`outputDir`).
 - Projects: `chromium`, `webkit`, `mobile-chrome`. Write tests to work on all three unless a test is explicitly gated.
 - Test dir: `./e2e`. Do not put E2E specs under `src/` — they will be excluded from Vitest and included here.
 
@@ -49,7 +49,7 @@ E2E_BASE_URL=https://nook-site-abc.vercel.app yarn e2e  # run against a deployed
 
 - Don't test content that belongs in a unit test (regex/helper logic) — put that in Vitest.
 - Don't assert on implementation details (CSS class names, component counts).
-- Don't commit `playwright-report/`, `test-results/`, or downloaded browser caches.
+- Don't commit `playwright-report/`, `playwright-artifacts/`, `test-results/` (legacy), or downloaded browser caches.
 
 ## If unsure
 

@@ -19,7 +19,7 @@ interface TranslationTree {
 const en: TranslationTree = {
   nav: {
     home: 'Home',
-    products: 'Products',
+    products: 'Our Collection',
     aboutUs: 'About',
     textileCare: 'Textile Care',
     courier: 'Delivery & Payment',
@@ -101,14 +101,14 @@ const en: TranslationTree = {
     visitTitle: 'Say hello',
     visitText:
       'Questions, custom pieces, or a chat about linen — we’d love to hear from you.',
-    locationTitle: 'Based in',
-    locationText: 'Belgrade, Serbia',
+    locationTitle: 'Instagram',
+    locationText: '@nook.belgrade',
     pickupTitle: 'Pickup partner',
     pickupText: 'MARFA Flower Shop, Belgrade\n(by arrangement after your order)',
     emailTitle: 'Email',
   },
   products: {
-    eyebrow: 'THE COLLECTION',
+    eyebrow: 'OUR COLLECTION',
     title: 'Find your table’s new favorite',
     lead:
       'Each piece is designed and sewn in Belgrade, using natural fabrics. Stocks are intentionally limited — if something is gone, it may return in the next batch.',
@@ -212,8 +212,8 @@ const en: TranslationTree = {
     contactTitle: 'Get in touch',
     contactLead:
       'We answer every message personally. For custom orders, questions about a piece or collaborations — please write to us.',
-    basedIn: 'Based in',
-    basedInValue: 'Belgrade, Serbia',
+    basedIn: 'Instagram',
+    basedInValue: '@nook.belgrade',
   },
   courier: {
     title: 'Delivery & Payment',
@@ -435,7 +435,7 @@ const en: TranslationTree = {
 const sr: TranslationTree = {
   nav: {
     home: 'Početna',
-    products: 'Proizvodi',
+    products: 'Naša kolekcija',
     aboutUs: 'O nama',
     textileCare: 'Nega tekstila',
     courier: 'Dostava i plaćanje',
@@ -517,14 +517,14 @@ const sr: TranslationTree = {
     visitTitle: 'Javite nam se',
     visitText:
       'Pitanja, narudžbine po meri ili samo kratak razgovor o lanu — rado ćemo vam odgovoriti.',
-    locationTitle: 'Sedište',
-    locationText: 'Beograd, Srbija',
+    locationTitle: 'Instagram',
+    locationText: '@nook.belgrade',
     pickupTitle: 'Preuzimanje',
     pickupText: 'MARFA Flower Shop, Beograd\n(po dogovoru, nakon narudžbine)',
     emailTitle: 'E-mail',
   },
   products: {
-    eyebrow: 'KOLEKCIJA',
+    eyebrow: 'NAŠA KOLEKCIJA',
     title: 'Pronađite novi omiljeni komad za sto',
     lead:
       'Svaki komad je dizajniran i šiven u Beogradu, od prirodnih materijala. Zalihe su namerno male — ako nečega nema, moguće je da se vrati u sledećoj seriji.',
@@ -628,8 +628,8 @@ const sr: TranslationTree = {
     contactTitle: 'Kontakt',
     contactLead:
       'Na svaku poruku odgovaramo lično. Za narudžbine po meri, pitanja o nekom komadu ili saradnje — pišite nam.',
-    basedIn: 'Sedište',
-    basedInValue: 'Beograd, Srbija',
+    basedIn: 'Instagram',
+    basedInValue: '@nook.belgrade',
   },
   courier: {
     title: 'Dostava i plaćanje',

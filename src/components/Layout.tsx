@@ -74,7 +74,7 @@ export default function Layout({ children }: LayoutProps) {
   const year = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <header 
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           showTransparentHeader
@@ -266,7 +266,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main className="flex-grow">{children}</main>
+      <main className="min-w-0 flex-grow overflow-x-hidden">{children}</main>
 
       <footer className="w-full bg-[#1e1e1e] text-[#e8e6e1]">
         <div className="container-padding py-16 lg:py-20">
