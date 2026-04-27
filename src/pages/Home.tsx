@@ -1,266 +1,169 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Instagram, Mail, MessageCircle } from "lucide-react";
+import { ArrowRight, Instagram, Mail, MessageCircle, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { products } from "../data/products";
 import { getAssetPath } from "../utils/images";
 import { useLanguage } from "../contexts/LanguageContext";
 
 const CONTACT_EMAIL = "nook.textile@gmail.com";
 const INSTAGRAM_URL = "https://www.instagram.com/nook.belgrade/";
 
+// Curated selection — fewer slides, more confidence.
 const HERO_IMAGES = [
   "/slider/hero-slider-01.jpg",
-  "/slider/hero-slider-02.jpg",
-  "/slider/hero-slider-03.jpg",
   "/slider/hero-slider-04.jpg",
-  "/slider/hero-slider-05.jpg",
-  "/slider/hero-slider-06.jpg",
   "/slider/hero-slider-07.jpg",
-  "/slider/hero-slider-08.jpg",
   "/slider/hero-slider-09.jpg",
-  "/slider/hero-slider-10.jpg",
-  "/slider/hero-slider-11.jpg",
   "/slider/hero-slider-12.jpg",
 ];
 
-// Swipe/drag hook that works for touch and mouse.
-// Returns handlers to spread onto the draggable element and whether we are actively dragging.
-function useSwipe(onNext: () => void, onPrev: () => void) {
-  const startRef = useRef<{ x: number; y: number; id: number } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+// Distinct lifestyle photos for the immersive bands so each section has its own atmosphere.
+const LINEN_IMAGE = "/slider/hero-slider-02.jpg";
+const COTTON_IMAGE = "/products/4-pink-coral/main.jpg";
+const STORY_IMAGE = "/slider/hero-slider-06.jpg";
+const CONTACT_IMAGE = "/slider/hero-slider-10.jpg";
 
-  const onPointerDown = (e: React.PointerEvent<HTMLElement>) => {
-    // Ignore right/middle clicks
-    if (e.button !== 0 && e.pointerType === "mouse") return;
-    startRef.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
-  };
-
-  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    if (!startRef.current || startRef.current.id !== e.pointerId) return;
-    const dx = e.clientX - startRef.current.x;
-    const dy = e.clientY - startRef.current.y;
-    // Once clearly horizontal, mark as dragging so we can change cursor & suppress clicks
-    if (!isDragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
-      setIsDragging(true);
-      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-    }
-  };
-
-  const finish = (e: React.PointerEvent<HTMLElement>) => {
-    if (!startRef.current || startRef.current.id !== e.pointerId) return;
-    const dx = e.clientX - startRef.current.x;
-    const dy = e.clientY - startRef.current.y;
-    startRef.current = null;
-    setIsDragging(false);
-    const threshold = 50;
-    if (Math.abs(dx) <= Math.abs(dy)) return; // vertical intent → leave as scroll
-    if (dx < -threshold) onNext();
-    else if (dx > threshold) onPrev();
-  };
-
-  return {
-    isDragging,
-    handlers: {
-      onPointerDown,
-      onPointerMove,
-      onPointerUp: finish,
-      onPointerCancel: finish,
-      // Prevent native image-drag from hijacking the gesture on desktop
-      onDragStart: (e: React.DragEvent) => e.preventDefault(),
-    },
-  };
+function useReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, visible };
 }
 
-// Custom hook for scroll-triggered reveals
-function useRevealOnScroll(threshold = 0.15) {
+function useParallax(factor = 0.2) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isRevealed, setIsRevealed] = useState(false);
-
+  const [offset, setOffset] = useState(0);
+  const onScroll = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const progress = -rect.top * factor;
+    setOffset(progress);
+  }, [factor]);
   useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsRevealed(true);
-          observer.unobserve(element);
-        }
-      },
-      { threshold }
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, isRevealed };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [onScroll]);
+  return { ref, offset };
 }
 
 export default function Home() {
   const { t } = useLanguage();
-  const [scrollY, setScrollY] = useState(0);
-  const heroImageRef = useRef<HTMLDivElement>(null);
-  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [cottonSlideIndex, setCottonSlideIndex] = useState(0);
-  const [linenSlideIndex, setLinenSlideIndex] = useState(0);
-  const [isCottonHovered, setIsCottonHovered] = useState(false);
-  const [isLinenHovered, setIsLinenHovered] = useState(false);
+  const [heroSlide, setHeroSlide] = useState(0);
   const [heroLoaded, setHeroLoaded] = useState(false);
+  const [chevronVisible, setChevronVisible] = useState(true);
 
-  // Reveal hooks for sections
-  const collectionReveal = useRevealOnScroll();
-  const cottonReveal = useRevealOnScroll();
-  const linenReveal = useRevealOnScroll();
-  const storyReveal = useRevealOnScroll();
-  const contactReveal = useRevealOnScroll();
+  const heroParallax = useParallax(0.2);
+  const linenParallax = useParallax(0.15);
+  const cottonParallax = useParallax(0.15);
+  const storyParallax = useParallax(0.18);
+  const contactParallax = useParallax(0.12);
 
-  const cottonProduct = products.find((p) => p.id === "4");
-  const linenProduct = products.find((p) => p.id === "1");
-  const cottonImages =
-    cottonProduct?.gallery || [cottonProduct?.image || ""].filter(Boolean);
-  const linenImages =
-    linenProduct?.gallery || [linenProduct?.image || ""].filter(Boolean);
+  const collectionReveal = useReveal();
+  const linenReveal = useReveal();
+  const cottonReveal = useReveal();
+  const storyReveal = useReveal();
+  const contactReveal = useReveal();
 
-  const heroSwipe = useSwipe(
-    () => setHeroSlideIndex((i) => (i + 1) % HERO_IMAGES.length),
-    () => setHeroSlideIndex((i) => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length),
-  );
-  const cottonSwipe = useSwipe(
-    () => setCottonSlideIndex((i) => (i + 1) % Math.max(cottonImages.length, 1)),
-    () => setCottonSlideIndex((i) => (i - 1 + cottonImages.length) % Math.max(cottonImages.length, 1)),
-  );
-  const linenSwipe = useSwipe(
-    () => setLinenSlideIndex((i) => (i + 1) % Math.max(linenImages.length, 1)),
-    () => setLinenSlideIndex((i) => (i - 1 + linenImages.length) % Math.max(linenImages.length, 1)),
-  );
-
-  const handleScroll = useCallback(() => {
-    setScrollY(window.scrollY);
+  useEffect(() => {
+    const t = setTimeout(() => setHeroLoaded(true), 100);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  useEffect(() => {
-    // Trigger hero animation after mount
-    const timer = setTimeout(() => setHeroLoaded(true), 100);
-    return () => clearTimeout(timer);
+    const id = setInterval(() => {
+      setHeroSlide((p) => (p + 1) % HERO_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
-    if (isHeroHovered || HERO_IMAGES.length <= 1) return;
-    const interval = setInterval(() => {
-      setHeroSlideIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isHeroHovered]);
-
-  useEffect(() => {
-    if (isCottonHovered || cottonImages.length <= 1) return;
-    const interval = setInterval(() => {
-      setCottonSlideIndex((prev) => (prev + 1) % cottonImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isCottonHovered, cottonImages.length]);
-
-  useEffect(() => {
-    if (isLinenHovered || linenImages.length <= 1) return;
-    const interval = setInterval(() => {
-      setLinenSlideIndex((prev) => (prev + 1) % linenImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isLinenHovered, linenImages.length]);
+    const timer = setTimeout(() => setChevronVisible(false), 4000);
+    const onScroll = () => {
+      if (window.scrollY > 80) setChevronVisible(false);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   return (
     <div className="w-full overflow-x-hidden">
-      {/* Hero Section */}
+      {/* ── Hero ── full-screen, cinematic, minimal UI */}
       <section
-        ref={heroImageRef}
-        className={`relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden select-none touch-pan-y ${
-          heroSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
-        }`}
-        onMouseEnter={() => setIsHeroHovered(true)}
-        onMouseLeave={() => setIsHeroHovered(false)}
-        {...heroSwipe.handlers}
+        ref={heroParallax.ref}
+        className="relative min-h-[100svh] flex items-center justify-center overflow-hidden"
       >
         <div
           className="absolute inset-0"
           style={{
-            transform: `translateY(${scrollY * 0.25}px) scale(${1 + scrollY * 0.0002})`,
+            transform: `translateY(${heroParallax.offset}px)`,
             willChange: "transform",
           }}
         >
           {HERO_IMAGES.map((image, index) => (
             <div
               key={image}
-              className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+              className="absolute inset-0 transition-opacity duration-[1400ms] ease-in-out"
               style={{
-                opacity: index === heroSlideIndex ? 1 : 0,
-                zIndex: index === heroSlideIndex ? 1 : 0,
+                opacity: index === heroSlide ? 1 : 0,
+                zIndex: index === heroSlide ? 1 : 0,
               }}
             >
               <img
                 src={getAssetPath(image)}
-                alt={`Hero slide ${index + 1}`}
+                alt=""
                 className="w-full h-full object-cover"
                 style={{ minHeight: "120%" }}
                 loading={index === 0 ? "eager" : "lazy"}
               />
             </div>
           ))}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/35 via-black/25 to-black/55" />
         </div>
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {HERO_IMAGES.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setHeroSlideIndex(index)}
-              className={`h-1 rounded-full transition-all duration-500 ${
-                index === heroSlideIndex 
-                  ? "w-8 bg-white" 
-                  : "w-2 bg-white/40 hover:bg-white/60"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
+        {/* Centered headline */}
         <div className="relative z-10 container-padding text-center max-w-4xl">
-          <p 
-            className={`section-subtitle text-[0.65rem] font-semibold uppercase tracking-[0.32em] mb-6 text-white/90 sm:text-xs transition-all duration-700 ${
+          <p
+            className={`text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.32em] mb-7 text-white/80 transition-all duration-700 ${
               heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
             {t("home.heroEyebrow")}
           </p>
-          <h1 
-            className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] text-white text-balance transition-all duration-700 delay-150 ${
-              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          <h1
+            className={`font-editorial text-[clamp(2.6rem,7vw,5.5rem)] font-medium leading-[1.04] tracking-[-0.025em] text-white text-balance mb-8 transition-all duration-1000 delay-200 ${
+              heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
             {t("home.heroTitle")}
           </h1>
-          <p 
-            className={`text-base md:text-lg mb-10 leading-relaxed text-white/90 max-w-2xl mx-auto transition-all duration-700 delay-300 ${
+          <p
+            className={`text-base md:text-lg text-white/85 leading-relaxed max-w-2xl mx-auto mb-10 transition-all duration-700 delay-500 ${
               heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
             {t("home.heroLead")}
           </p>
           <div
-            className={`transition-all duration-700 delay-500 ${
+            className={`transition-all duration-700 delay-700 ${
               heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
             <Link
               to="/products"
-              className="font-semibold py-4 px-10 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center group w-fit bg-white text-foreground"
+              className="font-semibold py-4 px-10 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center group bg-white text-foreground"
             >
               {t("home.heroCta")}
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -268,314 +171,278 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Slim bar indicators */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          {HERO_IMAGES.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setHeroSlide(index)}
+              className={`h-px transition-all duration-700 ${
+                index === heroSlide ? "w-12 bg-white" : "w-6 bg-white/40 hover:bg-white/70"
+              }`}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Scroll cue */}
         <div
-          className={`hidden lg:block absolute bottom-12 right-12 backdrop-blur-md p-6 shadow-large max-w-xs z-10 transition-all duration-700 delay-700 border border-white/10 ${
-            heroLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+          className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-opacity duration-700 delay-1000 ${
+            heroLoaded && chevronVisible ? "opacity-60" : "opacity-0"
           }`}
-          style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
         >
-          <p className="text-sm font-semibold mb-2 uppercase tracking-widest text-foreground">
-            {t("home.heroOverlayTitle")}
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {t("home.heroOverlayText")}
-          </p>
+          <ChevronDown className="h-4 w-4 text-white animate-bounce" aria-hidden />
         </div>
       </section>
 
-      {/* Collection Introduction */}
+      {/* ── Collection intro ── editorial pull-quote band */}
       <section
         ref={collectionReveal.ref}
-        className="section-padding w-full bg-white"
+        className="relative py-24 lg:py-32"
       >
-        <div className="max-w-7xl mx-auto container-padding text-center">
+        <div className="container-padding mx-auto max-w-3xl text-center">
+          <span
+            className={`block w-12 h-px bg-foreground/20 mx-auto mb-10 transition-all duration-700 ${
+              collectionReveal.visible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+            }`}
+            aria-hidden
+          />
           <p
-            className={`text-sm md:text-base uppercase tracking-[0.25em] mb-6 font-medium text-muted-foreground transition-all duration-700 ${
-              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            className={`text-[0.65rem] sm:text-xs uppercase tracking-[0.32em] mb-7 font-semibold text-muted-foreground transition-all duration-700 ${
+              collectionReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
             {t("home.collectionEyebrow")}
           </p>
           <h2
-            className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] text-foreground text-balance transition-all duration-700 delay-100 ${
-              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            className={`font-editorial text-[clamp(2rem,5vw,3.5rem)] font-medium leading-[1.1] tracking-[-0.02em] text-foreground text-balance mb-8 transition-all duration-1000 delay-150 ${
+              collectionReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
             {t("home.collectionTitle")}
           </h2>
           <p
-            className={`text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-muted-foreground transition-all duration-700 delay-200 ${
-              collectionReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            className={`font-editorial italic text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto transition-all duration-700 delay-300 ${
+              collectionReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
             {t("home.collectionLead")}
           </p>
-        </div>
-      </section>
-
-      {/* Linen */}
-      <section 
-        ref={linenReveal.ref}
-        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
-      >
-        <div
-          className={`relative overflow-hidden transition-all duration-1000 select-none touch-pan-y ${
-            linenSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
-          } ${
-            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
-          }`}
-          onMouseEnter={() => setIsLinenHovered(true)}
-          onMouseLeave={() => setIsLinenHovered(false)}
-          {...linenSwipe.handlers}
-        >
-          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
-            {linenImages.map((image, index) => (
-              <div
-                key={index}
-                className="absolute inset-0 transition-all duration-1000 ease-in-out"
-                style={{
-                  opacity: index === linenSlideIndex ? 1 : 0,
-                  transform: index === linenSlideIndex ? "scale(1)" : "scale(1.05)",
-                  zIndex: index === linenSlideIndex ? 1 : 0,
-                }}
-              >
-                <img
-                  src={image}
-                  alt={`Reindeer moss table runner — view ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-            {/* Image slide indicators */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {linenImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setLinenSlideIndex(index)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === linenSlideIndex 
-                      ? "w-6 bg-white" 
-                      : "w-2 bg-white/50 hover:bg-white/70"
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`flex flex-col justify-center relative bg-card transition-all duration-1000 delay-200 ${
-            linenReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
-          }`}
-        >
-          <div className="container-padding py-16 lg:py-24">
-            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
-              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
-                {t("home.linenEyebrow")}
-              </p>
-              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
-                {t("home.linenTitle")}
-              </h2>
-              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
-                {t("home.linenText")}
-              </p>
-              <Link
-                to="/products?category=Linen"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
-              >
-                <span className="relative">
-                  {t("home.linenCta")}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
-                </span>
-                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cotton */}
-      <section 
-        ref={cottonReveal.ref}
-        className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh] relative"
-      >
-        <div
-          className={`flex flex-col justify-center order-2 lg:order-1 relative bg-card transition-all duration-1000 delay-200 ${
-            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
-          }`}
-        >
-          <div className="container-padding py-16 lg:py-24 relative z-10">
-            <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center lg:mx-0 lg:ml-auto lg:items-start lg:text-left">
-              <p className="text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-medium text-muted-foreground">
-                {t("home.cottonEyebrow")}
-              </p>
-              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
-                {t("home.cottonTitle")}
-              </h2>
-              <p className="text-base md:text-lg mb-10 leading-relaxed text-muted-foreground">
-                {t("home.cottonText")}
-              </p>
-              <Link
-                to="/products?category=Cotton"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-foreground"
-              >
-                <span className="relative">
-                  {t("home.cottonCta")}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
-                </span>
-                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`relative overflow-hidden order-1 lg:order-2 transition-all duration-1000 select-none touch-pan-y ${
-            cottonSwipe.isDragging ? "cursor-grabbing" : "cursor-grab"
-          } ${
-            cottonReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
-          }`}
-          onMouseEnter={() => setIsCottonHovered(true)}
-          onMouseLeave={() => setIsCottonHovered(false)}
-          {...cottonSwipe.handlers}
-        >
-          <div className="relative w-full h-full" style={{ minHeight: "80vh" }}>
-            {cottonImages.map((image, index) => (
-              <div
-                key={index}
-                className="absolute inset-0 transition-all duration-1000 ease-in-out"
-                style={{
-                  opacity: index === cottonSlideIndex ? 1 : 0,
-                  transform: index === cottonSlideIndex ? "scale(1)" : "scale(1.05)",
-                  zIndex: index === cottonSlideIndex ? 1 : 0,
-                }}
-              >
-                <img
-                  src={image}
-                  alt={`Pink coral tablecloth — view ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-            {/* Image slide indicators */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {cottonImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCottonSlideIndex(index)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === cottonSlideIndex 
-                      ? "w-6 bg-white" 
-                      : "w-2 bg-white/50 hover:bg-white/70"
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Story */}
-      <section 
-        ref={storyReveal.ref}
-        className="relative min-h-[90vh] overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='fabric' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Crect width='40' height='40' fill='%23ffffff'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23000000' stroke-width='0.5' opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23fabric)'/%3E%3C/svg%3E")`,
-              backgroundSize: "80px 80px",
-            }}
+          <span
+            className={`block w-12 h-px bg-foreground/20 mx-auto mt-10 transition-all duration-700 delay-500 ${
+              collectionReveal.visible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+            }`}
+            aria-hidden
           />
         </div>
+      </section>
 
-        <div className="relative z-10 flex items-center justify-center min-h-[90vh] container-padding py-24 lg:py-32">
-          <div className="max-w-3xl mx-auto text-center">
-            <p 
-              className={`text-sm md:text-base text-white/80 uppercase tracking-[0.25em] mb-6 font-medium transition-all duration-700 ${
-                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
-            >
-              {t("home.storyEyebrow")}
+      {/* ── Linen ── full-bleed immersive band, text on left */}
+      <section
+        ref={linenParallax.ref}
+        className="relative min-h-[85vh] flex items-center overflow-hidden"
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translateY(${linenParallax.offset}px)`,
+            willChange: "transform",
+          }}
+        >
+          <img
+            src={getAssetPath(LINEN_IMAGE)}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ minHeight: "120%" }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent" />
+        </div>
+
+        <div
+          ref={linenReveal.ref}
+          className={`relative z-10 container-padding py-20 lg:py-28 mx-auto max-w-7xl w-full transition-all duration-1000 ${
+            linenReveal.visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+          }`}
+        >
+          <div className="max-w-lg lg:max-w-xl">
+            <p className="text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.32em] mb-6 text-white/70">
+              {t("home.linenEyebrow")}
             </p>
-            <h2
-              className={`heading-large font-editorial mb-8 leading-[1.06] tracking-[-0.02em] whitespace-pre-line text-balance text-white transition-all duration-700 delay-100 ${
-                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
-            >
-              {t("home.storyTitle")}
+            <h2 className="font-editorial text-[clamp(2.25rem,5.5vw,4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-white text-balance mb-6">
+              {t("home.linenTitle")}
             </h2>
-            <p 
-              className={`text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-200 ${
-                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
-            >
-              {t("home.storyText")}
+            <p className="text-base md:text-lg text-white/85 leading-relaxed mb-10 max-w-md">
+              {t("home.linenText")}
             </p>
-            <div
-              className={`mt-10 flex justify-center transition-all duration-700 delay-300 ${
-                storyReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
+            <Link
+              to="/products?category=Linen"
+              className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-white"
             >
-              <Link
-                to="/about"
-                className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-white"
-              >
-                <span className="relative">
-                  {t("home.storyCta")}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary origin-left transition-transform duration-300 group-hover:scale-x-110" />
-                </span>
-                <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </Link>
-            </div>
+              <span className="relative">
+                {t("home.linenCta")}
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-white origin-left transition-transform duration-300 group-hover:scale-x-110" />
+              </span>
+              <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section 
+      {/* ── Cotton ── full-bleed immersive band, text on right */}
+      <section
+        ref={cottonParallax.ref}
+        className="relative min-h-[85vh] flex items-center overflow-hidden"
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translateY(${cottonParallax.offset}px)`,
+            willChange: "transform",
+          }}
+        >
+          <img
+            src={getAssetPath(COTTON_IMAGE)}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ minHeight: "120%" }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-black/65 via-black/30 to-transparent" />
+        </div>
+
+        <div
+          ref={cottonReveal.ref}
+          className={`relative z-10 container-padding py-20 lg:py-28 mx-auto max-w-7xl w-full transition-all duration-1000 ${
+            cottonReveal.visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+          }`}
+        >
+          <div className="max-w-lg lg:max-w-xl ml-auto lg:text-right">
+            <p className="text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.32em] mb-6 text-white/70">
+              {t("home.cottonEyebrow")}
+            </p>
+            <h2 className="font-editorial text-[clamp(2.25rem,5.5vw,4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-white text-balance mb-6">
+              {t("home.cottonTitle")}
+            </h2>
+            <p className="text-base md:text-lg text-white/85 leading-relaxed mb-10 max-w-md lg:ml-auto">
+              {t("home.cottonText")}
+            </p>
+            <Link
+              to="/products?category=Cotton"
+              className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-white"
+            >
+              <ArrowRight className="mr-3 h-4 w-4 rotate-180 group-hover:-translate-x-2 transition-transform duration-300 lg:hidden" />
+              <span className="relative">
+                {t("home.cottonCta")}
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-white origin-left transition-transform duration-300 group-hover:scale-x-110" />
+              </span>
+              <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300 hidden lg:inline-block" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Story ── full-bleed real photo with parallax */}
+      <section
+        ref={storyParallax.ref}
+        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translateY(${storyParallax.offset}px)`,
+            willChange: "transform",
+          }}
+        >
+          <img
+            src={getAssetPath(STORY_IMAGE)}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ minHeight: "120%" }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1f1a17]/80 via-[#2a211c]/62 to-[#1f1a17]/84" />
+        </div>
+
+        <div
+          ref={storyReveal.ref}
+          className="relative z-10 container-padding py-24 lg:py-32 max-w-3xl mx-auto text-center"
+        >
+          <p
+            className={`text-[0.65rem] sm:text-xs text-white/80 uppercase tracking-[0.32em] mb-7 font-semibold transition-all duration-700 ${
+              storyReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+          >
+            {t("home.storyEyebrow")}
+          </p>
+          <h2
+            className={`font-editorial text-[clamp(2rem,5vw,3.75rem)] font-medium leading-[1.1] tracking-[-0.02em] whitespace-pre-line text-balance text-white mb-8 transition-all duration-1000 delay-150 ${
+              storyReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+          >
+            {t("home.storyTitle")}
+          </h2>
+          <p
+            className={`text-base md:text-lg text-white/85 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-300 ${
+              storyReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+          >
+            {t("home.storyText")}
+          </p>
+          <div
+            className={`mt-10 flex justify-center transition-all duration-700 delay-500 ${
+              storyReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+          >
+            <Link
+              to="/our-story"
+              className="text-sm uppercase tracking-widest font-semibold inline-flex items-center group relative text-white"
+            >
+              <span className="relative">
+                {t("home.storyCta")}
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-white origin-left transition-transform duration-300 group-hover:scale-x-110" />
+              </span>
+              <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contact ── real image left, details right */}
+      <section
         ref={contactReveal.ref}
         className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh]"
       >
-        <div className="relative bg-gray-900 overflow-hidden">
+        <div ref={contactParallax.ref} className="relative overflow-hidden min-h-[40vh] lg:min-h-[70vh]">
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0"
             style={{
-              background: `
-              repeating-linear-gradient(90deg, 
-                transparent 0px, 
-                rgba(255,255,255,0.1) 1px, 
-                transparent 2px,
-                transparent 20px
-              ),
-              repeating-linear-gradient(0deg, 
-                transparent 0px, 
-                rgba(255,255,255,0.1) 1px, 
-                transparent 2px,
-                transparent 20px
-              ),
-              linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%),
-              linear-gradient(45deg, rgba(0,0,0,0.1) 0%, transparent 50%)
-            `,
-              filter: "blur(2px)",
+              transform: `translateY(${contactParallax.offset}px)`,
+              willChange: "transform",
             }}
-          />
+          >
+            <img
+              src={getAssetPath(CONTACT_IMAGE)}
+              alt=""
+              className="h-full w-full object-cover"
+              style={{ minHeight: "120%" }}
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/25 via-transparent to-transparent" />
+          </div>
         </div>
 
         <div className="flex flex-col justify-center bg-card">
           <div className="container-padding py-16 lg:py-24">
-            <div 
+            <div
               className={`max-w-lg transition-all duration-700 ${
-                contactReveal.isRevealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                contactReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              <p className="text-sm md:text-base text-muted-foreground uppercase tracking-[0.25em] mb-4 font-medium">
+              <p className="text-[0.65rem] sm:text-xs text-muted-foreground uppercase tracking-[0.32em] mb-5 font-semibold">
                 {t("home.visitEyebrow")}
               </p>
-              <h2 className="heading-large font-editorial mb-6 leading-[1.06] tracking-[-0.02em] text-foreground text-balance">
+              <h2 className="font-editorial text-[clamp(2rem,4.5vw,3.25rem)] font-medium leading-[1.08] tracking-[-0.02em] text-foreground text-balance mb-6">
                 {t("home.visitTitle")}
               </h2>
               <p className="text-base md:text-lg text-muted-foreground mb-12 leading-relaxed">
@@ -619,10 +486,10 @@ export default function Home() {
                     delay: "delay-300",
                   },
                 ].map((item, index) => (
-                  <div 
+                  <div
                     key={index}
                     className={`flex items-start gap-4 transition-all duration-700 ${item.delay} ${
-                      contactReveal.isRevealed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                      contactReveal.visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
                     }`}
                   >
                     <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-primary shadow-md transition-transform duration-300 hover:scale-105">

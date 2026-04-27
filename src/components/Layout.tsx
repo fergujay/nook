@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
   const navigation = [
     { name: t("nav.home"), href: "/" },
     { name: t("nav.products"), href: "/products" },
-    { name: t("nav.aboutUs"), href: "/about" },
+    { name: t("nav.ourStory"), href: "/our-story" },
     { name: t("nav.textileCare"), href: "/textile-care" },
     { name: t("nav.courier"), href: "/courier" },
   ];
@@ -297,7 +297,7 @@ export default function Layout({ children }: LayoutProps) {
               <ul className="space-y-3 text-sm">
                 {[
                   { to: "/products", label: t("footer.linkCollection") },
-                  { to: "/about", label: t("footer.linkAbout") },
+                  { to: "/our-story", label: t("footer.linkStory") },
                   { to: "/textile-care", label: t("footer.linkCare") },
                   { to: "/courier", label: t("footer.linkDelivery") },
                 ].map((link) => (

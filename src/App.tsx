@@ -9,7 +9,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Order from "./pages/Order";
-import About from "./pages/About";
+import OurStory from "./pages/OurStory";
 import TextileCare from "./pages/TextileCare";
 import Courier from "./pages/Courier";
 import Returns from "./pages/Returns";
@@ -30,7 +30,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order" element={<Order />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/our-story" element={<OurStory />} />
               <Route path="/textile-care" element={<TextileCare />} />
               <Route path="/courier" element={<Courier />} />
               <Route path="/returns" element={<Returns />} />
